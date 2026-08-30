@@ -11,6 +11,7 @@ import {
 import type { EducationLevel, GoalCategory, UserProfile } from '../../engine/types';
 import { initializeSkillsForGoal } from '../../engine/skillGapEngine';
 import { generatePersonalizedRoadmap } from '../../engine/adaptiveEngine';
+import { generateChallengesForGoal, generateRoadmapMilestones, isGeminiConfigured } from '../../engine/geminiAI';
 
 interface ConversationalAIAssistantProps {
   userFullName: string;
@@ -207,69 +208,101 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
       // Process Skills
       setCapturedSkills(prev => [...prev, userResponse]);
       setStage(3);
-      setIsAiTyping(false);
 
-      // Goal-aware struggle options
-      const getStruggleOptions = () => {
-        const cat = capturedCategory;
-        if (cat === 'jee' || cat === 'neet') {
-          return [
-            { label: 'Calculus & Integration', value: 'Calculus derivations and integration problems', icon: '📐' },
-            { label: 'Organic Chemistry Mechanisms', value: 'Organic chemistry reaction mechanisms and named reactions', icon: '🧪' },
-            { label: 'Physics Numericals & Formulas', value: 'Physics numerical problems and formula application', icon: '⚡' },
-            { label: 'Time Management in Exam Hall', value: 'Managing time during 3-hour exam sessions', icon: '⏳' },
-            { label: 'Inorganic Chemistry & P-Block', value: 'Inorganic chemistry p-block and coordination compounds', icon: '🔬' }
-          ];
-        }
-        if (cat === 'ai_ml') {
-          return [
-            { label: 'Linear Algebra & Matrix Math', value: 'Linear algebra, eigenvalues and matrix operations for ML', icon: '🔢' },
-            { label: 'Understanding Neural Networks', value: 'Backpropagation and neural network architecture', icon: '🧠' },
-            { label: 'Implementing Models from Scratch', value: 'Coding ML models without libraries', icon: '💻' },
-            { label: 'Statistics & Probability', value: 'Bayesian stats and probability for ML', icon: '📊' },
-            { label: 'Productionizing & Deploying AI', value: 'Moving from notebooks to production ML pipelines', icon: '🚀' }
-          ];
-        }
-        if (cat === 'internship' || cat === 'swe') {
-          return [
-            { label: 'Solving Hard DSA Problems', value: 'Struggling to solve medium/hard LeetCode problems independently', icon: '🧩' },
-            { label: 'Trees, Graphs & DP', value: 'Dynamic programming and graph traversal algorithms', icon: '🌳' },
-            { label: 'System Design Concepts', value: 'System design, scalability and distributed systems basics', icon: '🏗️' },
-            { label: 'Time Management & Consistency', value: 'Daily consistency and pacing for placements', icon: '⏳' },
-            { label: 'Resume & Project Building', value: 'Building resume-worthy projects and open source contributions', icon: '📁' }
-          ];
-        }
-        if (cat === 'career_switch') {
-          return [
-            { label: 'Starting Programming from Zero', value: 'Learning programming fundamentals from scratch', icon: '🌱' },
-            { label: 'Building a Portfolio', value: 'Creating projects to showcase to employers', icon: '📁' },
-            { label: 'Understanding CS Fundamentals', value: 'Data structures, algorithms and CS theory basics', icon: '💻' },
-            { label: 'Imposter Syndrome & Confidence', value: 'Self-doubt and feeling behind peers from CS background', icon: '🧠' },
-            { label: 'Finding the Right Learning Path', value: 'Too many resources, unclear where to start', icon: '🗺️' }
-          ];
-        }
-        // Default / full-stack / data engineering / other
-        return [
-          { label: 'Database & SQL Optimization', value: 'Complex SQL queries, indexing and query optimization', icon: '🗄️' },
-          { label: 'Building Scalable Pipelines', value: 'Designing ETL pipelines and data workflows', icon: '🔄' },
-          { label: 'Frontend & API Integration', value: 'Connecting backend APIs with frontend frameworks', icon: '🌐' },
-          { label: 'Time Management & Consistency', value: 'Daily consistency and structured learning', icon: '⏳' },
-          { label: 'Deploying & DevOps', value: 'Docker, CI/CD pipelines and cloud deployment', icon: '🚀' }
-        ];
-      };
+      // For custom goals, use Gemini AI to generate specific challenges
+      const isCustomGoal = !['jee','neet','swe','internship','ai_ml','career_switch'].includes(capturedCategory);
 
-      setMessages(prev => [
-        ...prev,
-        {
-          id: `ai-struggles`,
-          sender: 'ai',
-          text: `Thanks for sharing your baseline.\n\n` +
-            `**What do you find most challenging or where do you get stuck the most?**\n` +
-            `(NEXORA will build targeted prerequisite paths around exactly these bottlenecks!)`,
-          options: getStruggleOptions(),
-          field: 'struggles'
-        }
-      ]);
+      if (isCustomGoal && isGeminiConfigured()) {
+        // Show "AI thinking" state while fetching
+        setMessages(prev => [
+          ...prev,
+          {
+            id: 'ai-struggles-loading',
+            sender: 'ai',
+            text: `Analyzing your goal **"${capturedGoal}"** with AI to find the most relevant challenges for you...`,
+            field: 'struggles'
+          }
+        ]);
+
+        generateChallengesForGoal(capturedGoal, capturedEducation).then(aiChallenges => {
+          setIsAiTyping(false);
+          setMessages(prev => prev.filter(m => m.id !== 'ai-struggles-loading').concat([
+            {
+              id: 'ai-struggles',
+              sender: 'ai',
+              text: `Based on your goal, here are the most common bottlenecks learners face:\n\n**What do you find most challenging?**\n(NEXORA will build targeted paths around your bottlenecks!)`,
+              options: aiChallenges.map(c => ({ label: c, value: c })),
+              field: 'struggles'
+            }
+          ]));
+        }).catch(() => {
+          setIsAiTyping(false);
+          setMessages(prev => prev.filter(m => m.id !== 'ai-struggles-loading').concat([{
+            id: 'ai-struggles',
+            sender: 'ai',
+            text: `**What do you find most challenging in your learning journey?**`,
+            options: [
+              { label: 'Mastering core fundamentals', value: `Core fundamentals of ${capturedGoal}` },
+              { label: 'Building real projects', value: 'Building projects from scratch' },
+              { label: 'Staying consistent daily', value: 'Maintaining daily study consistency' },
+              { label: 'Preparing for assessments', value: 'Interview and assessment preparation' },
+              { label: 'Finding right resources', value: 'Finding quality learning resources' }
+            ],
+            field: 'struggles'
+          }]));
+        });
+      } else {
+        setIsAiTyping(false);
+        // Static goal-aware options for known categories
+        const getStruggleOptions = () => {
+          const cat = capturedCategory;
+          if (cat === 'jee' || cat === 'neet') return [
+            { label: 'Calculus & Integration', value: 'Calculus derivations and integration problems' },
+            { label: 'Organic Chemistry Mechanisms', value: 'Organic chemistry reaction mechanisms' },
+            { label: 'Physics Numericals & Formulas', value: 'Physics numerical problems and formula application' },
+            { label: 'Time Management in Exam Hall', value: 'Managing time during 3-hour exam sessions' },
+            { label: 'Inorganic Chemistry & P-Block', value: 'Inorganic p-block and coordination compounds' }
+          ];
+          if (cat === 'ai_ml') return [
+            { label: 'Linear Algebra & Matrix Math', value: 'Linear algebra, eigenvalues and matrix operations for ML' },
+            { label: 'Understanding Neural Networks', value: 'Backpropagation and neural network architecture' },
+            { label: 'Implementing Models from Scratch', value: 'Coding ML models without libraries' },
+            { label: 'Statistics & Probability', value: 'Bayesian stats and probability for AI' },
+            { label: 'Deploying AI to Production', value: 'Moving from notebooks to production ML pipelines' }
+          ];
+          if (cat === 'internship' || cat === 'swe') return [
+            { label: 'Solving Hard DSA Problems', value: 'Solving medium/hard LeetCode problems independently' },
+            { label: 'Trees, Graphs & DP', value: 'Dynamic programming and graph traversal algorithms' },
+            { label: 'System Design Concepts', value: 'System design, scalability and distributed systems' },
+            { label: 'Time Management & Consistency', value: 'Daily consistency and pacing for placements' },
+            { label: 'Resume & Project Building', value: 'Building resume-worthy projects and open source' }
+          ];
+          if (cat === 'career_switch') return [
+            { label: 'Starting Programming from Zero', value: 'Learning programming fundamentals from scratch' },
+            { label: 'Building a Portfolio', value: 'Creating projects to showcase to employers' },
+            { label: 'Understanding CS Fundamentals', value: 'Data structures, algorithms and CS theory basics' },
+            { label: 'Imposter Syndrome & Confidence', value: 'Self-doubt and feeling behind CS peers' },
+            { label: 'Finding the Right Learning Path', value: 'Too many resources, unclear where to start' }
+          ];
+          return [
+            { label: 'Database & SQL Optimization', value: 'Complex SQL queries, indexing and query optimization' },
+            { label: 'Building Scalable Pipelines', value: 'Designing ETL pipelines and data workflows' },
+            { label: 'Frontend & API Integration', value: 'Connecting backend APIs with frontend frameworks' },
+            { label: 'Time Management & Consistency', value: 'Daily consistency and structured learning' },
+            { label: 'Deploying & DevOps', value: 'Docker, CI/CD pipelines and cloud deployment' }
+          ];
+        };
+        setMessages(prev => [
+          ...prev,
+          {
+            id: 'ai-struggles',
+            sender: 'ai',
+            text: `Thanks for sharing your baseline.\n\n**What do you find most challenging or where do you get stuck the most?**\n(NEXORA will build targeted prerequisite paths around exactly these bottlenecks!)`,
+            options: getStruggleOptions(),
+            field: 'struggles'
+          }
+        ]);
+      }
     } else if (stage === 3) {
       // Process Struggles
       setCapturedStruggles(prev => [...prev, userResponse]);
@@ -314,11 +347,12 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
     setTimeout(() => setGenerationStep(2), 700);
     setTimeout(() => setGenerationStep(3), 1500);
     setTimeout(() => setGenerationStep(4), 2200);
-    setTimeout(() => {
-      // Synthesize complete user profile
+
+    const buildProfile = async () => {
       const isJEE = capturedCategory === 'jee' || capturedEducation === 'Class 10' || capturedEducation === 'Class 12';
       const goalCat = isJEE ? 'jee' : capturedCategory;
       const goalTitle = capturedGoal || (isJEE ? 'Crack JEE Main & Advanced' : 'Software Engineering Internship');
+      const isCustomGoal = !['jee','neet','swe','internship','ai_ml','career_switch'].includes(goalCat);
 
       const skills = initializeSkillsForGoal(goalCat);
 
@@ -332,7 +366,7 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
         branchOrStream: `${capturedEducation} Pathway`,
         goalCategory: goalCat,
         goalTitle,
-        goalNaturalLanguage: `Targeting: ${goalTitle}. Current level: ${capturedEducation}. Strengths: ${capturedSkills.join(', ')}. Challenges: ${capturedStruggles.join(', ')}.`,
+        goalNaturalLanguage: `Targeting: ${goalTitle}. Level: ${capturedEducation}. Strengths: ${capturedSkills.join(', ')}. Challenges: ${capturedStruggles.join(', ')}.`,
         dailyAvailabilityMinutes: capturedDailyMinutes,
         learningPreference: capturedPref,
         struggles: capturedStruggles.length > 0 ? capturedStruggles : ['Consistency', 'Core Problem Solving'],
@@ -340,11 +374,21 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
         baselineDiagnosticCompleted: false,
         assessmentHistory: [],
         pathVersion: 1,
-        lastPathUpdateReason: `AI synthesized a personalized Mindmap Roadmap for ${goalTitle}.`,
+        lastPathUpdateReason: `AI synthesized a personalized roadmap for ${goalTitle}.`,
         feedbackLog: []
       };
 
-      const roadmap = generatePersonalizedRoadmap(partialProfile);
+      // For custom goals: use Gemini to generate roadmap; else use static engine
+      let roadmap;
+      if (isCustomGoal && isGeminiConfigured()) {
+        try {
+          roadmap = await generateRoadmapMilestones(goalTitle, capturedEducation, capturedDailyMinutes);
+        } catch {
+          roadmap = generatePersonalizedRoadmap(partialProfile);
+        }
+      } else {
+        roadmap = generatePersonalizedRoadmap(partialProfile);
+      }
 
       const finalProfile: UserProfile = {
         ...partialProfile,
@@ -352,8 +396,11 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
       } as UserProfile;
 
       onComplete(finalProfile);
-    }, 3000);
+    };
+
+    setTimeout(() => { buildProfile(); }, 3000);
   };
+
 
   // LIVE AI GENERATION SCREEN
   if (isGenerating) {
