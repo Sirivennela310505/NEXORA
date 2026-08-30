@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Lock, Mail, User, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { X, Lock, Mail, User, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import { NexoraLogo } from '../common/NexoraLogo';
 import { hashPassword, getRegisteredAccounts, saveRegisteredAccounts } from '../../engine/storage';
 import type { StoredUserAccount } from '../../engine/storage';
-import { 
-  firebaseSignInWithGoogle, 
-  isFirebaseConfigured 
-} from '../../engine/firebase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -36,19 +32,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [successNotice, setSuccessNotice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Phone OTP flow state
-  const [phoneMode, setPhoneMode] = useState<'idle' | 'phone' | 'otp'>('idle');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [generatedOtp, setGeneratedOtp] = useState('');
-  const [phoneName, setPhoneName] = useState('');
-
-  // Reset all sub-view states whenever modal opens or initialMode changes
+  // Reset all states whenever modal opens or initialMode changes
   useEffect(() => {
     if (isOpen) {
       setMode(initialMode);
-      setGooglePromptOpen(false);
-      setPhoneMode('idle');
       setErrorMsg('');
       setSuccessNotice('');
       setIsSubmitting(false);
@@ -60,6 +47,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessNotice('');
     
     if (!fullName.trim()) {
       setErrorMsg('Please enter your full name.');
@@ -85,7 +73,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsSubmitting(true);
     setTimeout(() => {
       const existing = getRegisteredAccounts();
-      if (existing.some(acc => acc.email.toLowerCase() === email.toLowerCase())) {
+      if (existing.some(acc => acc.email.toLowerCase() === email.trim().toLowerCase())) {
         setErrorMsg('An account with this email already exists. Please Sign In.');
         setIsSubmitting(false);
         return;
@@ -102,16 +90,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       saveRegisteredAccounts([...existing, newAccount]);
       setIsSubmitting(false);
       
-      setSuccessNotice('Account created successfully! Please sign in with your credentials.');
-      setMode('signin');
-      setPassword('');
-      setConfirmPassword('');
-    }, 450);
+      // Auto log in directly after account creation
+      onSuccess(newAccount, true);
+      onClose();
+    }, 400);
   };
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessNotice('');
 
     if (!email.trim() || !password) {
       setErrorMsg('Please enter both email and password.');
@@ -121,10 +109,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsSubmitting(true);
     setTimeout(() => {
       const accounts = getRegisteredAccounts();
-      const user = accounts.find(acc => acc.email.toLowerCase() === email.toLowerCase());
+      const user = accounts.find(acc => acc.email.toLowerCase() === email.trim().toLowerCase());
 
       if (!user) {
-        setErrorMsg('No account found with this email. Please create an account.');
+        // If demo/first time user, provide instant registration convenience or clear message
+        setErrorMsg('No account found with this email. Please switch to Create Account.');
         setIsSubmitting(false);
         return;
       }
@@ -138,7 +127,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setIsSubmitting(false);
       onSuccess(user, false);
       onClose();
-    }, 400);
+    }, 350);
   };
 
   const handleForgotPassword = (e: React.FormEvent) => {
@@ -146,14 +135,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setErrorMsg('');
 
     if (!email.includes('@')) {
-      setErrorMsg('Please enter a valid email address to reset your password.');
+      setErrorMsg('Please enter a valid email address.');
       return;
     }
 
     setIsSubmitting(true);
     setTimeout(() => {
       const accounts = getRegisteredAccounts();
-      const userIndex = accounts.findIndex(acc => acc.email.toLowerCase() === email.toLowerCase());
+      const userIndex = accounts.findIndex(acc => acc.email.toLowerCase() === email.trim().toLowerCase());
 
       if (userIndex === -1) {
         setErrorMsg('No registered account found with this email.');
@@ -165,121 +154,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       saveRegisteredAccounts(accounts);
 
       setIsSubmitting(false);
-      setSuccessNotice(`Password reset instructions sent. Your temporary password is set to: nexora123`);
+      setSuccessNotice(`Password reset successfully. Your temporary password is: nexora123`);
       setMode('signin');
-    }, 500);
-  };
-
-  // Google prompt state
-  const [googlePromptOpen, setGooglePromptOpen] = useState(false);
-  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
-  const [customGoogleName, setCustomGoogleName] = useState('');
-
-  // ---- Google Auth (Firebase / Dynamic Account Selector) ----
-  const handleGoogleSignIn = async () => {
-    setErrorMsg('');
-    setIsSubmitting(true);
-
-    if (isFirebaseConfigured) {
-      try {
-        const user = await firebaseSignInWithGoogle();
-        const existing = getRegisteredAccounts();
-        const gEmail = user.email || 'google.user@gmail.com';
-        let account = existing.find(a => a.email.toLowerCase() === gEmail.toLowerCase());
-        if (!account) {
-          account = {
-            id: `ggl_${user.uid}`,
-            fullName: user.displayName || 'Google User',
-            email: gEmail,
-            passwordHash: hashPassword(user.uid),
-            createdAt: new Date().toISOString()
-          };
-          saveRegisteredAccounts([...existing, account]);
-        }
-        setIsSubmitting(false);
-        onSuccess(account, false);
-        onClose();
-        return;
-      } catch (err: any) {
-        console.warn('Firebase Google Auth error/fallback:', err);
-      }
-    }
-
-    // Open Google Account Picker view
-    setIsSubmitting(false);
-    setGooglePromptOpen(true);
-  };
-
-  const handleConfirmGoogleAccount = (selectedEmail: string, selectedName: string) => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      const existing = getRegisteredAccounts();
-      let account = existing.find(a => a.email.toLowerCase() === selectedEmail.toLowerCase());
-      if (!account) {
-        account = {
-          id: `ggl_${Date.now()}`,
-          fullName: selectedName || selectedEmail.split('@')[0],
-          email: selectedEmail.toLowerCase(),
-          passwordHash: hashPassword('google-oauth'),
-          createdAt: new Date().toISOString()
-        };
-        saveRegisteredAccounts([...existing, account]);
-      }
-      setIsSubmitting(false);
-      setGooglePromptOpen(false);
-      onSuccess(account, false);
-      onClose();
-    }, 400);
-  };
-
-
-  // ---- Phone OTP Sign In (simulated) ----
-  const handleSendOtp = () => {
-    if (phoneNumber.replace(/\D/g, '').length < 10) {
-      setErrorMsg('Please enter a valid 10-digit phone number.');
-      return;
-    }
-    setErrorMsg('');
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(otp);
-    setPhoneMode('otp');
-    setSuccessNotice(`OTP sent to ${phoneNumber}. For demo, your OTP is: ${otp}`);
-  };
-
-  const handleVerifyOtp = () => {
-    if (otpCode !== generatedOtp) {
-      setErrorMsg('Invalid OTP. Please try again.');
-      return;
-    }
-    setErrorMsg('');
-    const existing = getRegisteredAccounts();
-    const phoneEmail = `phone_${phoneNumber.replace(/\D/g, '')}@nexora.app`;
-    let account = existing.find(a => a.email === phoneEmail);
-    if (!account) {
-      account = {
-        id: `ph_${Date.now()}`,
-        fullName: phoneName || `User ${phoneNumber.slice(-4)}`,
-        email: phoneEmail,
-        passwordHash: hashPassword(phoneNumber),
-        createdAt: new Date().toISOString()
-      };
-      saveRegisteredAccounts([...existing, account]);
-    }
-    onSuccess(account, !existing.find(a => a.email === phoneEmail));
-    onClose();
+      setPassword('nexora123');
+    }, 450);
   };
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative w-full max-w-md bg-[#0f172a] border border-slate-700 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5 text-slate-100 my-auto">
+      <div className="relative w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6 text-slate-100 my-auto">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+          className="absolute top-5 right-5 p-2 text-slate-400 hover:text-white rounded-xl hover:bg-zinc-800 transition-colors"
+          aria-label="Close dialog"
         >
           <X className="w-5 h-5" />
         </button>
@@ -289,29 +181,49 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <div className="flex justify-center">
             <NexoraLogo size="sm" showText={false} />
           </div>
-          <h3 className="text-xl font-bold font-display text-white">
-            {googlePromptOpen
-              ? 'Sign in with Google'
-              : phoneMode !== 'idle'
-              ? 'Phone Verification'
-              : mode === 'signup'
-              ? 'Create your NEXORA account'
-              : mode === 'signin'
-              ? 'Welcome back to NEXORA'
-              : 'Reset your password'}
+          <h3 className="text-2xl font-bold font-display text-white tracking-tight">
+            {mode === 'signup' 
+              ? 'Create Your Account' 
+              : mode === 'signin' 
+              ? 'Welcome to NEXORA' 
+              : 'Reset Password'}
           </h3>
-          <p className="text-xs text-slate-400">
-            {googlePromptOpen
-              ? 'Choose a Google account to continue to NEXORA'
-              : phoneMode !== 'idle'
-              ? 'Enter your 10-digit mobile number for instant OTP verification'
-              : mode === 'signup'
-              ? 'Join serious learners charting adaptive career paths.'
+          <p className="text-xs text-slate-400 max-w-xs mx-auto">
+            {mode === 'signup'
+              ? 'Start your personalized AI career roadmap and track daily targets.'
               : mode === 'signin'
-              ? 'Sign in to access your personalized roadmap & progress.'
-              : 'Enter your verified email to receive a password reset link.'}
+              ? 'Sign in to access your flowchart roadmap, assessments & progress.'
+              : 'Enter your account email to receive your password reset key.'}
           </p>
         </div>
+
+        {/* Tab Switcher (Sign In / Create Account) */}
+        {mode !== 'forgot' && (
+          <div className="flex p-1 bg-zinc-900 border border-zinc-800 rounded-2xl">
+            <button
+              type="button"
+              onClick={() => { setMode('signin'); setErrorMsg(''); setSuccessNotice(''); }}
+              className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all ${
+                mode === 'signin'
+                  ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMode('signup'); setErrorMsg(''); setSuccessNotice(''); }}
+              className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all ${
+                mode === 'signup'
+                  ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Create Account
+            </button>
+          </div>
+        )}
 
         {/* Success Alert */}
         {successNotice && (
@@ -329,424 +241,237 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         )}
 
-        {/* VIEW 1: GOOGLE ACCOUNT CHOOSER */}
-        {googlePromptOpen ? (
-          <div className="space-y-4 pt-2 animate-fade-in">
-            <div className="space-y-2">
-              <button
-                type="button"
-                onClick={() => handleConfirmGoogleAccount('alex.morgan@gmail.com', 'Alex Morgan')}
-                className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 transition-all text-left group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center font-bold text-cyan-300 text-xs">
-                    AM
-                  </div>
-                  <div>
-                    <div className="text-xs font-semibold text-white group-hover:text-cyan-300">Alex Morgan</div>
-                    <div className="text-[11px] text-slate-400">alex.morgan@gmail.com</div>
-                  </div>
-                </div>
-                <span className="text-[10px] text-slate-500 group-hover:text-cyan-400 font-semibold">Select →</span>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3 my-2">
-              <div className="flex-1 h-px bg-slate-800" />
-              <span className="text-[10px] text-slate-500 font-medium">or use another Gmail account</span>
-              <div className="flex-1 h-px bg-slate-800" />
-            </div>
-
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-300">Full Name</label>
+        {/* FORM: CREATE ACCOUNT */}
+        {mode === 'signup' && (
+          <form onSubmit={handleSignUp} className="space-y-3.5">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">Full Name</label>
+              <div className="relative">
+                <User className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
                 <input
                   type="text"
-                  placeholder="e.g. Sarah Connor"
-                  value={customGoogleName}
-                  onChange={e => setCustomGoogleName(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                  required
+                  placeholder="e.g. Alex Morgan"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 text-xs bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
                 />
               </div>
+            </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-300">Google Email Address</label>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
                 <input
                   type="email"
-                  placeholder="name@gmail.com"
-                  value={customGoogleEmail}
-                  onChange={e => setCustomGoogleEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                  required
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 text-xs bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
                 />
               </div>
+            </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  if (!customGoogleEmail.includes('@')) {
-                    setErrorMsg('Please enter a valid Gmail address.');
-                    return;
-                  }
-                  handleConfirmGoogleAccount(customGoogleEmail, customGoogleName);
-                }}
-                className="w-full py-2.5 px-4 bg-white hover:bg-gray-100 text-gray-900 font-semibold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
-              >
-                <span>Continue with {customGoogleEmail || 'Google Account'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Minimum 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 pr-10 py-2 text-xs bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">Confirm Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Re-enter password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 text-xs bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-1">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
+                className="rounded border-zinc-700 bg-zinc-900 text-cyan-500 focus:ring-0"
+              />
+              <label htmlFor="terms">
+                I agree to the <span className="text-slate-200">Terms of Service</span> & <span className="text-slate-200">Privacy Policy</span>
+              </label>
             </div>
 
             <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full mt-2 py-3 px-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-xl transition-all shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <span>Creating Account & Loading Dashboard...</span>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>Create Account & Start Learning</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </form>
+        )}
+
+        {/* FORM: SIGN IN */}
+        {mode === 'signin' && (
+          <form onSubmit={handleSignIn} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
+                <input
+                  type="email"
+                  required
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2.5 text-xs bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300">Password</label>
+                <button
+                  type="button"
+                  onClick={() => { setMode('forgot'); setErrorMsg(''); setSuccessNotice(''); }}
+                  className="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium"
+                >
+                  Forgot password?
+                </button>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 pr-10 py-2.5 text-xs bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full mt-2 py-3 px-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-xl transition-all shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <span>Signing in...</span>
+              ) : (
+                <>
+                  <span>Sign In to Dashboard</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </form>
+        )}
+
+        {/* FORM: FORGOT PASSWORD */}
+        {mode === 'forgot' && (
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">Registered Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
+                <input
+                  type="email"
+                  required
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2.5 text-xs bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-colors"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3 px-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs rounded-xl transition-all shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isSubmitting ? <span>Processing...</span> : <span>Send Reset Instructions</span>}
+            </button>
+
+            <button
               type="button"
-              onClick={() => setGooglePromptOpen(false)}
+              onClick={() => { setMode('signin'); setErrorMsg(''); setSuccessNotice(''); }}
               className="w-full text-xs text-slate-400 hover:text-white text-center pt-2"
             >
-              ← Back to standard Sign In
+              ← Back to Sign In
             </button>
-          </div>
-        ) : phoneMode !== 'idle' ? (
-          /* VIEW 2: PHONE OTP FLOW */
-          <div className="space-y-4 pt-2 animate-fade-in">
-            {phoneMode === 'phone' ? (
-              <>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Your Name</label>
-                  <input
-                    type="text"
-                    placeholder="Full name"
-                    value={phoneName}
-                    onChange={e => setPhoneName(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Phone Number</label>
-                  <div className="flex gap-2">
-                    <span className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-slate-300 font-mono">+91</span>
-                    <input
-                      type="tel"
-                      placeholder="10-digit mobile number"
-                      value={phoneNumber}
-                      onChange={e => setPhoneNumber(e.target.value)}
-                      className="flex-1 px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleSendOtp}
-                  className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-cyan-600/20"
-                >
-                  Send OTP
-                </button>
-              </>
-            ) : (
-              <>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Enter 6-digit OTP</label>
-                  <input
-                    type="text"
-                    maxLength={6}
-                    placeholder="______"
-                    value={otpCode}
-                    onChange={e => setOtpCode(e.target.value)}
-                    className="w-full text-center tracking-[0.5em] px-3 py-2.5 text-sm bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleVerifyOtp}
-                  className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-cyan-600/20"
-                >
-                  Verify & Sign In
-                </button>
-              </>
-            )}
-            <button
-              type="button"
-              onClick={() => { setPhoneMode('idle'); setErrorMsg(''); setSuccessNotice(''); setOtpCode(''); setPhoneNumber(''); }}
-              className="w-full text-xs text-slate-400 hover:text-white text-center pt-1"
-            >
-              ← Back to email sign in
-            </button>
-          </div>
-        ) : (
-          /* VIEW 3: MAIN SIGN IN / SIGN UP / FORGOT PASSWORD */
-          <div className="space-y-4 animate-fade-in">
-            {/* Social Buttons */}
-            {mode !== 'forgot' && (
-              <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white hover:bg-gray-100 text-gray-800 font-semibold text-xs transition-all shadow-md disabled:opacity-50"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 48 48">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                  </svg>
-                  Continue with Google
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => { setPhoneMode('phone'); setErrorMsg(''); setSuccessNotice(''); }}
-                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold text-xs transition-all"
-                >
-                  <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z" />
-                  </svg>
-                  Continue with Phone Number
-                </button>
-
-                <div className="flex items-center gap-3 py-1">
-                  <div className="flex-1 h-px bg-slate-800" />
-                  <span className="text-[11px] text-slate-500 font-medium">or continue with email</span>
-                  <div className="flex-1 h-px bg-slate-800" />
-                </div>
-              </div>
-            )}
-
-            {/* FORM: SIGN UP */}
-            {mode === 'signup' && (
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. John Doe"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Email Address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      placeholder="Minimum 6 characters"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-9 pr-9 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Confirm Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      placeholder="Re-enter password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    checked={agreeTerms}
-                    onChange={(e) => setAgreeTerms(e.target.checked)}
-                    className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
-                  />
-                  <label htmlFor="terms">
-                    I agree to the <span className="text-slate-200">Terms of Service</span> and <span className="text-slate-200">Privacy Policy</span>
-                  </label>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <span>Creating Account...</span>
-                  ) : (
-                    <>
-                      <span>Create Account</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* FORM: SIGN IN */}
-            {mode === 'signin' && (
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Email Address</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-slate-300">Password</label>
-                    <button
-                      type="button"
-                      onClick={() => setMode('forgot')}
-                      className="text-[11px] text-brand-400 hover:text-brand-300"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-9 pr-9 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isSubmitting ? (
-                    <span>Signing in...</span>
-                  ) : (
-                    <>
-                      <span>Sign In</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* FORM: FORGOT PASSWORD */}
-            {mode === 'forgot' && (
-              <form onSubmit={handleForgotPassword} className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Registered Email</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isSubmitting ? <span>Processing...</span> : <span>Send Reset Instructions</span>}
-                </button>
-              </form>
-            )}
-
-            {/* Footer Mode Switcher */}
-            <div className="pt-4 border-t border-slate-800/80 text-center text-xs text-slate-400">
-              {mode === 'signup' && (
-                <p>
-                  Already have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setMode('signin'); setErrorMsg(''); setSuccessNotice(''); }}
-                    className="text-brand-400 hover:text-brand-300 font-semibold"
-                  >
-                    Sign In
-                  </button>
-                </p>
-              )}
-
-              {mode === 'signin' && (
-                <p>
-                  Don't have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setMode('signup'); setErrorMsg(''); setSuccessNotice(''); }}
-                    className="text-brand-400 hover:text-brand-300 font-semibold"
-                  >
-                    Create Account
-                  </button>
-                </p>
-              )}
-
-              {mode === 'forgot' && (
-                <button
-                  type="button"
-                  onClick={() => { setMode('signin'); setErrorMsg(''); }}
-                  className="text-brand-400 hover:text-brand-300 font-semibold"
-                >
-                  Back to Sign In
-                </button>
-              )}
-            </div>
-          </div>
+          </form>
         )}
+
+        {/* Bottom Helper */}
+        <div className="pt-3 border-t border-zinc-800/80 text-center text-xs text-slate-400">
+          {mode === 'signup' ? (
+            <p>
+              Already have an account?{' '}
+              <button
+                type="button"
+                onClick={() => { setMode('signin'); setErrorMsg(''); setSuccessNotice(''); }}
+                className="text-cyan-400 hover:text-cyan-300 font-semibold"
+              >
+                Sign In
+              </button>
+            </p>
+          ) : mode === 'signin' ? (
+            <p>
+              Don't have an account?{' '}
+              <button
+                type="button"
+                onClick={() => { setMode('signup'); setErrorMsg(''); setSuccessNotice(''); }}
+                className="text-cyan-400 hover:text-cyan-300 font-semibold"
+              >
+                Create Account
+              </button>
+            </p>
+          ) : null}
+        </div>
 
       </div>
     </div>
   );
 };
-
