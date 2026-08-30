@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ArrowLeft, Home, ChevronRight } from 'lucide-react';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { LandingPage } from './components/landing/LandingPage';
@@ -52,10 +53,11 @@ export function App() {
     return null;
   });
 
-  // Modals & Navigation
+  // Modals & Navigation with History Stack for Back Button
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [authInitialMode, setAuthInitialMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
   const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [tabHistory, setTabHistory] = useState<string[]>(['dashboard']);
   const [tabPayload, setTabPayload] = useState<any>(null);
 
   // Notification Banner
@@ -84,6 +86,7 @@ export function App() {
       if (existing) {
         setCurrentUserProfile(existing);
         setActiveTab('dashboard');
+        setTabHistory(['dashboard']);
         triggerToast(`Welcome back, ${account.fullName}!`);
       } else {
         setCurrentUserProfile(null);
@@ -96,6 +99,7 @@ export function App() {
     setCurrentAccount(null);
     setCurrentUserProfile(null);
     setActiveTab('dashboard');
+    setTabHistory(['dashboard']);
     triggerToast('You have been securely signed out.');
   };
 
@@ -103,6 +107,7 @@ export function App() {
     saveUserProfile(newProfile);
     setCurrentUserProfile(newProfile);
     setActiveTab('dashboard');
+    setTabHistory(['dashboard']);
     triggerToast('Your personalized goal path & daily targets are ready!');
   };
 
@@ -115,9 +120,40 @@ export function App() {
   };
 
   const handleNavigateWithPayload = (tabId: string, payload?: any) => {
+    setTabHistory(prev => (prev[prev.length - 1] === tabId ? prev : [...prev, tabId]));
     setActiveTab(tabId);
     setTabPayload(payload);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleGoBack = () => {
+    if (tabHistory.length > 1) {
+      const newHistory = [...tabHistory];
+      newHistory.pop(); // remove active tab
+      const previousTab = newHistory[newHistory.length - 1];
+      setTabHistory(newHistory);
+      setActiveTab(previousTab);
+      setTabPayload(null);
+    } else {
+      setActiveTab('dashboard');
+      setTabPayload(null);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getTabLabel = (id: string) => {
+    switch (id) {
+      case 'dashboard': return 'Dashboard & Targets';
+      case 'roadmap': return 'Flowchart Roadmap';
+      case 'resources': return 'Free Books & Resources';
+      case 'diary': return 'Study Diary & Notes';
+      case 'analytics': return 'Skill Gaps & Quizzes';
+      case 'assessments': return 'Diagnostic Assessment';
+      case 'career': return 'Internships & Opportunities';
+      case 'ai-navigator': return 'AI Pathfinder Tutor';
+      case 'profile': return 'Profile Settings';
+      default: return id;
+    }
   };
 
   return (
@@ -168,22 +204,63 @@ export function App() {
           />
         </div>
       ) : (
-        // AUTHENTICATED FULL-SCREEN WORKSPACE WITH PINNED SIDEBAR
+        // AUTHENTICATED FULL-SCREEN WORKSPACE WITH PINNED SIDEBAR & GLOBAL BACK BAR
         <div className="flex h-screen w-screen overflow-hidden bg-black text-slate-100">
           
           {/* Pinned Left Sidebar */}
           <AppSidebar
             activeTab={activeTab}
-            onSelectTab={setActiveTab}
+            onSelectTab={handleNavigateWithPayload}
             profile={currentUserProfile}
             onSignOut={handleSignOut}
           />
 
           {/* Full-bleed Scrollable Main Content */}
-          <main className="flex-1 h-screen overflow-y-auto bg-black p-4 sm:p-8">
+          <main className="flex-1 h-screen overflow-y-auto bg-black flex flex-col">
             
-            {/* Active Workspace View */}
-            <div className="w-full min-w-0">
+            {/* Top Global Back & Breadcrumb Bar */}
+            <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-white/[0.08] px-4 sm:px-8 py-3 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                {activeTab !== 'dashboard' ? (
+                  <button
+                    onClick={handleGoBack}
+                    className="px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-white/[0.1] hover:border-cyan-400 text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-md group"
+                    title="Go back to previous screen"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+                    <span>Back</span>
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                    <Home className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Home Dashboard</span>
+                  </div>
+                )}
+
+                {/* Breadcrumb path */}
+                {activeTab !== 'dashboard' && (
+                  <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 font-medium">
+                    <button 
+                      onClick={() => handleNavigateWithPayload('dashboard')} 
+                      className="hover:text-white transition-colors"
+                    >
+                      Dashboard
+                    </button>
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+                    <span className="text-cyan-400 font-bold">{getTabLabel(activeTab)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Student Goal Tag */}
+              <div className="text-right hidden sm:block">
+                <span className="text-[11px] text-slate-400">Target: </span>
+                <span className="text-[11px] font-bold text-slate-200">{currentUserProfile.goalTitle}</span>
+              </div>
+            </div>
+
+            {/* Active Workspace Viewport */}
+            <div className="p-4 sm:p-8 flex-1">
               {activeTab === 'dashboard' && (
                 <DashboardView
                   profile={currentUserProfile}
