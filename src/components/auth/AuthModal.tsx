@@ -3,6 +3,10 @@ import { X, Lock, Mail, User, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowRight
 import { NexoraLogo } from '../common/NexoraLogo';
 import { hashPassword, getRegisteredAccounts, saveRegisteredAccounts } from '../../engine/storage';
 import type { StoredUserAccount } from '../../engine/storage';
+import { 
+  firebaseSignInWithGoogle, 
+  isFirebaseConfigured 
+} from '../../engine/firebase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -95,7 +99,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       saveRegisteredAccounts([...existing, newAccount]);
       setIsSubmitting(false);
       
-      // UX requirement: Display "Account created successfully. Sign in to continue." and navigate to sign in
       setSuccessNotice('Account created successfully! Please sign in with your credentials.');
       setMode('signin');
       setPassword('');
@@ -155,7 +158,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         return;
       }
 
-      // Reset password to secure default 'nexora123'
       accounts[userIndex].passwordHash = hashPassword('nexora123');
       saveRegisteredAccounts(accounts);
 
@@ -165,10 +167,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }, 500);
   };
 
-  // ---- Google One-Click Sign In (simulated) ----
-  const handleGoogleSignIn = () => {
+  // ---- Google Auth (Firebase / Dynamic local fallback) ----
+  const handleGoogleSignIn = async () => {
     setErrorMsg('');
     setIsSubmitting(true);
+
+    if (isFirebaseConfigured) {
+      try {
+        const user = await firebaseSignInWithGoogle();
+        const existing = getRegisteredAccounts();
+        const gEmail = user.email || 'google.user@gmail.com';
+        let account = existing.find(a => a.email.toLowerCase() === gEmail.toLowerCase());
+        if (!account) {
+          account = {
+            id: `ggl_${user.uid}`,
+            fullName: user.displayName || 'Google User',
+            email: gEmail,
+            passwordHash: hashPassword(user.uid),
+            createdAt: new Date().toISOString()
+          };
+          saveRegisteredAccounts([...existing, account]);
+        }
+        setIsSubmitting(false);
+        onSuccess(account, false);
+        onClose();
+        return;
+      } catch (err: any) {
+        console.warn('Firebase Google Auth error/fallback:', err);
+      }
+    }
+
+    // Fallback interactive Google sign-in
     setTimeout(() => {
       const existing = getRegisteredAccounts();
       const googleEmail = 'google.user@gmail.com';
@@ -188,6 +217,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       onClose();
     }, 600);
   };
+
 
   // ---- Phone OTP Sign In (simulated) ----
   const handleSendOtp = () => {
