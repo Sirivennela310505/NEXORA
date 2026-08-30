@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Lock, Mail, User, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
 import { NexoraLogo } from '../common/NexoraLogo';
 import { hashPassword, getRegisteredAccounts, saveRegisteredAccounts } from '../../engine/storage';
@@ -21,7 +21,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   onSuccess
 }) => {
-  const [prevInitialMode, setPrevInitialMode] = useState(initialMode);
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(initialMode);
   
   // Form fields
@@ -44,13 +43,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [phoneName, setPhoneName] = useState('');
 
-  // Adjust state during render when initialMode changes
-  if (initialMode !== prevInitialMode) {
-    setPrevInitialMode(initialMode);
-    setMode(initialMode);
-    setErrorMsg('');
-    setSuccessNotice('');
-  }
+  // Reset all sub-view states whenever modal opens or initialMode changes
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode);
+      setGooglePromptOpen(false);
+      setPhoneMode('idle');
+      setErrorMsg('');
+      setSuccessNotice('');
+      setIsSubmitting(false);
+    }
+  }, [isOpen, initialMode]);
 
   if (!isOpen) return null;
 
@@ -267,8 +270,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-md bg-[#0c101c] border border-slate-800/90 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5 text-slate-100">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in overflow-y-auto"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="relative w-full max-w-md bg-[#0f172a] border border-slate-700 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5 text-slate-100 my-auto">
         
         {/* Close Button */}
         <button
