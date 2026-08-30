@@ -22,7 +22,8 @@ import {
   getActiveSessionUserId, 
   setActiveSession, 
   getUserProfile, 
-  saveUserProfile
+  saveUserProfile,
+  createNewUserDefaultProfile
 } from './engine/storage';
 import type { StoredUserAccount } from './engine/storage';
 
@@ -79,19 +80,18 @@ export function App() {
     setActiveSession(account.id);
     setAuthModalOpen(false);
 
+    let profile = getUserProfile(account.id);
+    if (!profile) {
+      profile = createNewUserDefaultProfile(account);
+    }
+    setCurrentUserProfile(profile);
+    setActiveTab('dashboard');
+    setTabHistory(['dashboard']);
+    
     if (isNewSignUp) {
-      setCurrentUserProfile(null);
-      triggerToast(`Welcome to NEXORA, ${account.fullName}! Let's build your personalized path.`);
+      triggerToast(`Welcome to NEXORA, ${account.fullName}! Your personalized dashboard is active.`);
     } else {
-      const existing = getUserProfile(account.id);
-      if (existing) {
-        setCurrentUserProfile(existing);
-        setActiveTab('dashboard');
-        setTabHistory(['dashboard']);
-        triggerToast(`Welcome back, ${account.fullName}!`);
-      } else {
-        setCurrentUserProfile(null);
-      }
+      triggerToast(`Welcome back, ${account.fullName}! Signed in successfully.`);
     }
   };
 
@@ -175,9 +175,9 @@ export function App() {
       {/* RENDER UNAUTHENTICATED OR AUTHENTICATED */}
       {!currentUserProfile ? (
         <div className="flex flex-col min-h-screen bg-black">
-          {/* Public Top Navbar */}
+          {/* Public / Onboarding Top Navbar */}
           <Navbar
-            currentUser={null}
+            currentUser={currentAccount ? ({ fullName: currentAccount.fullName, email: currentAccount.email } as any) : null}
             activeTab={activeTab}
             onSelectTab={handleNavigateWithPayload}
             onOpenAuth={handleOpenAuth}

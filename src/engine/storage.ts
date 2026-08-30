@@ -223,3 +223,45 @@ export function createAaravSharmaDemoProfile(): UserProfile {
     activeRoadmap: initialRoadmap
   } as UserProfile;
 }
+
+export function createNewUserDefaultProfile(account: StoredUserAccount): UserProfile {
+  const skills = initializeSkillsForGoal('swe', {
+    'Programming Fundamentals & Syntax': 'Intermediate',
+    'Object-Oriented Programming (OOP)': 'Basic',
+    'Data Structures: Arrays, Strings & Hashing': 'Basic',
+  });
+
+  const baseProfile: Partial<UserProfile> = {
+    id: account.id,
+    fullName: account.fullName,
+    email: account.email,
+    createdAt: account.createdAt || new Date().toISOString(),
+    onboardingCompleted: true,
+    educationLevel: 'Undergraduate',
+    branchOrStream: 'Computer Science / Engineering',
+    goalCategory: 'swe',
+    goalTitle: 'Software Engineering Internship & Placements',
+    goalNaturalLanguage: 'Targeting Software Engineering placement with adaptive skill remediation.',
+    dailyAvailabilityMinutes: 90,
+    learningPreference: 'Mixed',
+    struggles: ['Solving Medium/Hard DSA Problems independently', 'System Design Concepts'],
+    skills,
+    baselineDiagnosticCompleted: true,
+    assessmentHistory: [],
+    pathVersion: 1,
+    lastPathUpdateReason: 'Profile created via direct authentication.',
+    feedbackLog: []
+  };
+
+  const initialRoadmap = generatePersonalizedRoadmap(baseProfile);
+  if (initialRoadmap[0]) initialRoadmap[0].status = 'in_progress';
+  if (initialRoadmap[1]) initialRoadmap[1].status = 'unlocked';
+
+  const fullProfile: UserProfile = {
+    ...baseProfile,
+    activeRoadmap: initialRoadmap
+  } as UserProfile;
+
+  saveUserProfile(fullProfile);
+  return fullProfile;
+}

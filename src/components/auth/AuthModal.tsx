@@ -167,7 +167,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }, 500);
   };
 
-  // ---- Google Auth (Firebase / Dynamic local fallback) ----
+  // Google prompt state
+  const [googlePromptOpen, setGooglePromptOpen] = useState(false);
+  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
+  const [customGoogleName, setCustomGoogleName] = useState('');
+
+  // ---- Google Auth (Firebase / Dynamic Account Selector) ----
   const handleGoogleSignIn = async () => {
     setErrorMsg('');
     setIsSubmitting(true);
@@ -197,25 +202,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
     }
 
-    // Fallback interactive Google sign-in
+    // Open Google Account Picker view
+    setIsSubmitting(false);
+    setGooglePromptOpen(true);
+  };
+
+  const handleConfirmGoogleAccount = (selectedEmail: string, selectedName: string) => {
+    setIsSubmitting(true);
     setTimeout(() => {
       const existing = getRegisteredAccounts();
-      const googleEmail = 'google.user@gmail.com';
-      let account = existing.find(a => a.email === googleEmail);
+      let account = existing.find(a => a.email.toLowerCase() === selectedEmail.toLowerCase());
       if (!account) {
         account = {
           id: `ggl_${Date.now()}`,
-          fullName: 'Google User',
-          email: googleEmail,
+          fullName: selectedName || selectedEmail.split('@')[0],
+          email: selectedEmail.toLowerCase(),
           passwordHash: hashPassword('google-oauth'),
           createdAt: new Date().toISOString()
         };
         saveRegisteredAccounts([...existing, account]);
       }
       setIsSubmitting(false);
+      setGooglePromptOpen(false);
       onSuccess(account, false);
       onClose();
-    }, 600);
+    }, 400);
   };
 
 
@@ -273,57 +284,130 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <NexoraLogo size="sm" showText={false} />
           </div>
           <h3 className="text-xl font-bold font-display text-white">
-            {mode === 'signup' && 'Create your NEXORA account'}
-            {mode === 'signin' && 'Welcome back to NEXORA'}
-            {mode === 'forgot' && 'Reset your password'}
+            {googlePromptOpen ? 'Sign in with Google' : mode === 'signup' ? 'Create your NEXORA account' : mode === 'signin' ? 'Welcome back to NEXORA' : 'Reset your password'}
           </h3>
           <p className="text-xs text-slate-400">
-            {mode === 'signup' && 'Join serious learners charting adaptive career paths.'}
-            {mode === 'signin' && 'Sign in to access your personalized roadmap.'}
-            {mode === 'forgot' && 'Enter your verified email to receive a password reset link.'}
+            {googlePromptOpen ? 'Choose an account to continue to NEXORA' : mode === 'signup' ? 'Join serious learners charting adaptive career paths.' : mode === 'signin' ? 'Sign in to access your personalized roadmap.' : 'Enter your verified email to receive a password reset link.'}
           </p>
         </div>
 
-        {/* Social Login Buttons — shown on signup & signin */}
-        {mode !== 'forgot' && phoneMode === 'idle' && (
-          <div className="space-y-3">
-            {/* Google */}
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white hover:bg-gray-100 text-gray-800 font-semibold text-xs transition-all shadow-md disabled:opacity-50"
-            >
-              {/* Google SVG icon */}
-              <svg className="w-4 h-4" viewBox="0 0 48 48">
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-              </svg>
-              Continue with Google
-            </button>
+        {/* GOOGLE ACCOUNT CHOOSER SCREEN */}
+        {googlePromptOpen ? (
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => handleConfirmGoogleAccount('alex.morgan@gmail.com', 'Alex Morgan')}
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 transition-all text-left group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center font-bold text-cyan-300 text-xs">
+                    AM
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-white group-hover:text-cyan-300">Alex Morgan</div>
+                    <div className="text-[11px] text-slate-400">alex.morgan@gmail.com</div>
+                  </div>
+                </div>
+                <span className="text-[10px] text-slate-500 group-hover:text-cyan-400">Select →</span>
+              </button>
+            </div>
 
-            {/* Phone Number */}
-            <button
-              type="button"
-              onClick={() => { setPhoneMode('phone'); setErrorMsg(''); setSuccessNotice(''); }}
-              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold text-xs transition-all"
-            >
-              <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z" />
-              </svg>
-              Continue with Phone Number
-            </button>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 my-2">
               <div className="flex-1 h-px bg-slate-800" />
-              <span className="text-[11px] text-slate-500 font-medium">or continue with email</span>
+              <span className="text-[10px] text-slate-500">or use another Gmail account</span>
               <div className="flex-1 h-px bg-slate-800" />
             </div>
+
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300">Your Full Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Sarah Connor"
+                  value={customGoogleName}
+                  onChange={e => setCustomGoogleName(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300">Google Email Address</label>
+                <input
+                  type="email"
+                  placeholder="name@gmail.com"
+                  value={customGoogleEmail}
+                  onChange={e => setCustomGoogleEmail(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (!customGoogleEmail.includes('@')) {
+                    setErrorMsg('Please enter a valid Gmail address.');
+                    return;
+                  }
+                  handleConfirmGoogleAccount(customGoogleEmail, customGoogleName);
+                }}
+                className="w-full py-2.5 px-4 bg-white hover:bg-gray-100 text-gray-900 font-semibold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
+              >
+                <span>Continue with {customGoogleEmail || 'Google Account'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setGooglePromptOpen(false)}
+              className="w-full text-xs text-slate-400 hover:text-white text-center pt-2"
+            >
+              ← Cancel Google Sign-In
+            </button>
           </div>
-        )}
+        ) : (
+          <>
+            {/* Social Login Buttons — shown on signup & signin */}
+            {mode !== 'forgot' && phoneMode === 'idle' && (
+              <div className="space-y-3">
+                {/* Google */}
+                <button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={isSubmitting}
+                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white hover:bg-gray-100 text-gray-800 font-semibold text-xs transition-all shadow-md disabled:opacity-50"
+                >
+                  {/* Google SVG icon */}
+                  <svg className="w-4 h-4" viewBox="0 0 48 48">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                  </svg>
+                  Continue with Google
+                </button>
+
+                {/* Phone Number */}
+                <button
+                  type="button"
+                  onClick={() => { setPhoneMode('phone'); setErrorMsg(''); setSuccessNotice(''); }}
+                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold text-xs transition-all"
+                >
+                  <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z" />
+                  </svg>
+                  Continue with Phone Number
+                </button>
+
+                {/* Divider */}
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-slate-800" />
+                  <span className="text-[11px] text-slate-500 font-medium">or continue with email</span>
+                  <div className="flex-1 h-px bg-slate-800" />
+                </div>
+              </div>
+            )}
 
         {/* Phone OTP UI */}
         {(phoneMode === 'phone' || phoneMode === 'otp') && mode !== 'forgot' && (
@@ -641,6 +725,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </button>
           )}
         </div>
+
+          </>
+        )}
 
       </div>
     </div>
