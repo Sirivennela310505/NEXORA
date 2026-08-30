@@ -33,6 +33,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [successNotice, setSuccessNotice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Phone OTP flow state
+  const [phoneMode, setPhoneMode] = useState<'idle' | 'phone' | 'otp'>('idle');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [phoneName, setPhoneName] = useState('');
+
   // Adjust state during render when initialMode changes
   if (initialMode !== prevInitialMode) {
     setPrevInitialMode(initialMode);
@@ -158,6 +165,66 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }, 500);
   };
 
+  // ---- Google One-Click Sign In (simulated) ----
+  const handleGoogleSignIn = () => {
+    setErrorMsg('');
+    setIsSubmitting(true);
+    setTimeout(() => {
+      const existing = getRegisteredAccounts();
+      const googleEmail = 'google.user@gmail.com';
+      let account = existing.find(a => a.email === googleEmail);
+      if (!account) {
+        account = {
+          id: `ggl_${Date.now()}`,
+          fullName: 'Google User',
+          email: googleEmail,
+          passwordHash: hashPassword('google-oauth'),
+          createdAt: new Date().toISOString()
+        };
+        saveRegisteredAccounts([...existing, account]);
+      }
+      setIsSubmitting(false);
+      onSuccess(account, false);
+      onClose();
+    }, 600);
+  };
+
+  // ---- Phone OTP Sign In (simulated) ----
+  const handleSendOtp = () => {
+    if (phoneNumber.replace(/\D/g, '').length < 10) {
+      setErrorMsg('Please enter a valid 10-digit phone number.');
+      return;
+    }
+    setErrorMsg('');
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedOtp(otp);
+    setPhoneMode('otp');
+    setSuccessNotice(`OTP sent to ${phoneNumber}. For demo, your OTP is: ${otp}`);
+  };
+
+  const handleVerifyOtp = () => {
+    if (otpCode !== generatedOtp) {
+      setErrorMsg('Invalid OTP. Please try again.');
+      return;
+    }
+    setErrorMsg('');
+    const existing = getRegisteredAccounts();
+    const phoneEmail = `phone_${phoneNumber.replace(/\D/g, '')}@nexora.app`;
+    let account = existing.find(a => a.email === phoneEmail);
+    if (!account) {
+      account = {
+        id: `ph_${Date.now()}`,
+        fullName: phoneName || `User ${phoneNumber.slice(-4)}`,
+        email: phoneEmail,
+        passwordHash: hashPassword(phoneNumber),
+        createdAt: new Date().toISOString()
+      };
+      saveRegisteredAccounts([...existing, account]);
+    }
+    onSuccess(account, !existing.find(a => a.email === phoneEmail));
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
       <div className="relative w-full max-w-md bg-[#0c101c] border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5">
@@ -186,6 +253,115 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {mode === 'forgot' && 'Enter your verified email to receive a password reset link.'}
           </p>
         </div>
+
+        {/* Social Login Buttons — shown on signup & signin */}
+        {mode !== 'forgot' && phoneMode === 'idle' && (
+          <div className="space-y-3">
+            {/* Google */}
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white hover:bg-gray-100 text-gray-800 font-semibold text-xs transition-all shadow-md disabled:opacity-50"
+            >
+              {/* Google SVG icon */}
+              <svg className="w-4 h-4" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              Continue with Google
+            </button>
+
+            {/* Phone Number */}
+            <button
+              type="button"
+              onClick={() => { setPhoneMode('phone'); setErrorMsg(''); setSuccessNotice(''); }}
+              className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold text-xs transition-all"
+            >
+              <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z" />
+              </svg>
+              Continue with Phone Number
+            </button>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-slate-800" />
+              <span className="text-[11px] text-slate-500 font-medium">or continue with email</span>
+              <div className="flex-1 h-px bg-slate-800" />
+            </div>
+          </div>
+        )}
+
+        {/* Phone OTP UI */}
+        {(phoneMode === 'phone' || phoneMode === 'otp') && mode !== 'forgot' && (
+          <div className="space-y-4">
+            {phoneMode === 'phone' ? (
+              <>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Your Name</label>
+                  <input
+                    type="text"
+                    placeholder="Full name"
+                    value={phoneName}
+                    onChange={e => setPhoneName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Phone Number</label>
+                  <div className="flex gap-2">
+                    <span className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300">+91</span>
+                    <input
+                      type="tel"
+                      placeholder="10-digit number"
+                      value={phoneNumber}
+                      onChange={e => setPhoneNumber(e.target.value)}
+                      className="flex-1 px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs rounded-lg transition-all"
+                >
+                  Send OTP
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Enter 6-digit OTP</label>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="______"
+                    value={otpCode}
+                    onChange={e => setOtpCode(e.target.value)}
+                    className="w-full text-center tracking-[0.5em] px-3 py-2.5 text-sm bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs rounded-lg transition-all"
+                >
+                  Verify & Sign In
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={() => { setPhoneMode('idle'); setErrorMsg(''); setSuccessNotice(''); setOtpCode(''); setPhoneNumber(''); }}
+              className="w-full text-xs text-slate-400 hover:text-white text-center"
+            >
+              ← Back to email sign in
+            </button>
+          </div>
+        )}
 
         {/* Success Alert */}
         {successNotice && (
