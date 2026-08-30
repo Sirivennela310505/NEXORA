@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NEXORA — Official Project Executive Summary & Technical Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+    
+    @page {
+      size: A4;
+      margin: 1.5cm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #1a202c;
+      background-color: #ffffff;
+      line-height: 1.6;
+      font-size: 13px;
+      padding: 2.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header-box {
+      border-bottom: 3px solid #0284c7;
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .brand-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 14px;
+      color: #0284c7;
+      font-weight: 700;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .meta-tag {
+      text-align: right;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      border-left: 4px solid #0284c7;
+      padding-left: 10px;
+      margin-top: 1.8rem;
+      margin-bottom: 0.8rem;
+    }
+
+    h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    p {
+      margin-bottom: 0.8rem;
+      color: #334155;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    .highlight-box {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin: 1.2rem 0;
+    }
+
+    .quote-box {
+      background-color: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      padding: 1rem 1.2rem;
+      border-radius: 0 10px 10px 0;
+      margin: 1rem 0;
+      font-style: italic;
+      color: #0369a1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.2rem 0;
+      font-size: 12px;
+    }
+
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-info { background: #e0f2fe; color: #0369a1; }
+    .badge-purple { background: #f3e8ff; color: #7e22ce; }
+
+    .footer {
+      margin-top: 3rem;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 1rem;
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .print-btn {
+      display: inline-block;
+      background: #0284c7;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      margin-bottom: 20px;
+      cursor: pointer;
+      border: none;
+    }
+
+    @media print {
+      .print-btn { display: none; }
+      body { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="print-btn" onclick="window.print()">🖨️ Save as PDF / Print Document</button>
+
+  <div class="header-box">
+    <div>
+      <div class="brand-title">🌌 NEXORA</div>
+      <div class="brand-subtitle">Adaptive AI Learning Navigator & Prerequisite Graph Architecture</div>
+    </div>
+    <div class="meta-tag">
+      <strong>Problem Statement:</strong> AI-Powered Personalized Learning Path<br>
+      <strong>Author:</strong> Sirivennela<br>
+      <strong>Status:</strong> Prototype & Production Ready
+    </div>
+  </div>
+
+  <h2>1. Etymology: Why the Name "NEXORA"?</h2>
+  <p>The name <strong>NEXORA</strong> is derived from two core scientific and cosmological roots:</p>
+  <ul>
+    <li><strong>NEXUS</strong> <em>(Latin for 'connection / linking node')</em>: Represents how all concepts, prerequisites, and skills are connected in a Directed Acyclic Graph (DAG) rather than a linear list.</li>
+    <li><strong>AURORA / NOVA</strong> <em>(The dawn of light & brilliant star burst)</em>: Signifies personal enlightenment, intelligent guidance, and the clear illumination of a student's optimal career and academic path.</li>
+  </ul>
+  <div class="quote-box">
+    "NEXORA bridges the gap between chaotic knowledge and structured personal mastery by mapping every prerequisite link along a learner's journey."
+  </div>
+
+  <h2>2. Alignment with the Problem Statement</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%;">Required Task Specification</th>
+        <th style="width: 35%;">Traditional Failure Point</th>
+        <th style="width: 35%;">NEXORA AI Implementation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Conversational Interface & Natural Language</strong></td>
+        <td>Rigid keyword drop-downs with no understanding of student context.</td>
+        <td>Voice & text conversational wizard capturing student aspirations in plain English.</td>
+      </tr>
+      <tr>
+        <td><strong>Learner Profiling Engine</strong></td>
+        <td>Generic grouping (ignores 10th vs JEE vs B.Tech backgrounds).</td>
+        <td>Granular profiling of education stage, daily minutes, modality, and self-reported bottlenecks.</td>
+      </tr>
+      <tr>
+        <td><strong>Prerequisite Path Generator</strong></td>
+        <td>Static, linear course lists with hidden prerequisite traps.</td>
+        <td>Adaptive Flowchart DAG with topological sorting, tier sequencing, and milestone locks.</td>
+      </tr>
+      <tr>
+        <td><strong>Recommendation Engine</strong></td>
+        <td>Paywalled affiliate links and random video recommendations.</td>
+        <td>100% free verified curricula (MIT OCW, CS50, Disha 45-Yr PYQs, HCV, NeetCode).</td>
+      </tr>
+      <tr>
+        <td><strong>Explainable AI Assistant</strong></td>
+        <td>Black-box recommendations with no reasoning provided.</td>
+        <td>Context-aware explanations for every recommendation and real-time AI Tutor chat.</td>
+      </tr>
+      <tr>
+        <td><strong>Dashboard & Next Best Action</strong></td>
+        <td>Passive percentage counters that don't tell the student what to do.</td>
+        <td>Actionable Day 1 checklist, Next Best Action hero card, and daily Study Diary.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. Core Innovations & How NEXORA Works</h2>
+  
+  <h3>A. Dynamic Prerequisite Graph Engine (DAG)</h3>
+  <p>Instead of treating education as an isolated list of videos, NEXORA models subjects as an <strong>Adaptive Prerequisite Graph</strong>. Before allowing a student to attempt complex topics (e.g. <em>Dynamic Programming</em> or <em>JEE Calculus</em>), NEXORA verifies that all upstream prerequisite foundations (e.g. <em>Recursion, Trigonometry, Limits</em>) are solidly mastered.</p>
+
+  <h3>B. Rigorous 10–15 Question Skill-Gap Diagnostic Engine</h3>
+  <p>Most platforms guess a student's proficiency with 1 or 2 trivial questions. NEXORA runs comprehensive <strong>10 to 15 question diagnostic benchmarks</strong> per topic. If a student scores below 65%, NEXORA calculates the exact deficit percentage and automatically injects a <strong>Targeted Visual Remediation Node</strong> into their roadmap, preventing foundation failure downstream.</p>
+
+  <h3>C. Full Stage-Specific Customization</h3>
+  <ul>
+    <li><strong>Class 10th Students:</strong> 95%+ CBSE/State Board mastery, NCERT Exemplars, and Olympiad foundations.</li>
+    <li><strong>Class 12 / JEE / NEET:</strong> Calculus, Mechanics, Organic Mechanisms, Disha Publications 45-Year PYQs, and HC Verma.</li>
+    <li><strong>B.Tech / SDE Aspirants:</strong> NeetCode 150 Core DSA, System Design, and top tech internship eligibility unlocks.</li>
+    <li><strong>Project Builders:</strong> Full-Stack microservices, database indexing, and cloud production deployment.</li>
+  </ul>
+
+  <h3>D. Personal Study Diary & Habit Streak Tracker</h3>
+  <p>Students can log session takeaways, formulas, and mood notes, with a prominent <strong>"Mark I Completed Today's Work!"</strong> button that records daily consistency and builds study streaks.</p>
+
+  <h2>4. Summary of Impact</h2>
+  <div class="highlight-box">
+    <p><strong>NEXORA completely reimagines digital learning</strong> from passive course aggregation to an intelligent, adaptive navigator. By diagnosing skill gaps early and sequencing learning through structured prerequisite graphs, NEXORA eliminates learning fatigue and gives every student a clear, actionable path to their dream goals.</p>
+  </div>
+
+  <div class="footer">
+    <span>NEXORA AI Learning System • Hackathon Submission</span>
+    <span>Live Repository: github.com/Sirivennela310505/NEXORA</span>
+  </div>
+
+</body>
+</html>
