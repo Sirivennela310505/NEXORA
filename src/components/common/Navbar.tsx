@@ -10,7 +10,6 @@ import {
   LogOut, 
   Menu, 
   X, 
-  Sparkles,
   ChevronRight
 } from 'lucide-react';
 import { NexoraLogo } from './NexoraLogo';
@@ -21,7 +20,6 @@ interface NavbarProps {
   activeTab: string;
   onSelectTab: (tab: string) => void;
   onOpenAuth: (mode: 'signin' | 'signup') => void;
-  onStartDemo: (persona?: 'alex' | 'aarav') => void;
   onSignOut: () => void;
 }
 
@@ -30,7 +28,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   onSelectTab,
   onOpenAuth,
-  onStartDemo,
   onSignOut
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -120,23 +117,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           {!currentUser ? (
             <>
               <button
-                onClick={() => onStartDemo('alex')}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-brand-300 bg-brand-950/70 hover:bg-brand-900/80 border border-brand-500/30 rounded-lg transition-all shadow-sm"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-                <span>Explore Demo</span>
-              </button>
-
-              <button
                 onClick={() => onOpenAuth('signin')}
-                className="px-3.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all"
+                className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-zinc-900 rounded-xl transition-all"
               >
                 Sign In
               </button>
 
               <button
                 onClick={() => onOpenAuth('signup')}
-                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-500 rounded-lg transition-all shadow-lg shadow-brand-600/25 hover:shadow-brand-500/40"
+                className="flex items-center gap-1.5 px-5 py-2 text-xs font-bold text-black bg-cyan-500 hover:bg-cyan-400 rounded-xl transition-all shadow-lg shadow-cyan-500/25"
               >
                 <span>Get Started Free</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -144,18 +133,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             </>
           ) : (
             <div className="flex items-center gap-3">
-              {currentUser.isDemoUser && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[11px] font-medium text-amber-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  <span>Demo Mode ({currentUser.fullName.split(' ')[0]})</span>
-                </div>
-              )}
-
               <button
                 onClick={() => onSelectTab('profile')}
-                className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/50 transition-all text-left"
+                className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-white/[0.08] transition-all text-left"
               >
-                <div className="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center text-xs font-bold text-white uppercase">
+                <div className="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center text-xs font-bold text-black uppercase">
                   {currentUser.fullName.charAt(0)}
                 </div>
                 <div className="hidden sm:flex flex-col">
@@ -183,15 +165,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex md:hidden items-center gap-2">
           {!currentUser && (
             <button
-              onClick={() => onStartDemo('alex')}
-              className="px-2.5 py-1 text-[11px] font-semibold text-brand-300 bg-brand-950/70 border border-brand-500/30 rounded-md"
+              onClick={() => onOpenAuth('signup')}
+              className="px-3 py-1.5 text-xs font-bold text-black bg-cyan-500 rounded-lg"
             >
-              Demo
+              Get Started
             </button>
           )}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/60"
+            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-zinc-900"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

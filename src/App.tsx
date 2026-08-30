@@ -21,9 +21,7 @@ import {
   getActiveSessionUserId, 
   setActiveSession, 
   getUserProfile, 
-  saveUserProfile,
-  createAlexMorganDemoProfile,
-  createAaravSharmaDemoProfile
+  saveUserProfile
 } from './engine/storage';
 import type { StoredUserAccount } from './engine/storage';
 
@@ -31,7 +29,7 @@ export function App() {
   // Authentication & Session State initialized from storage
   const [currentAccount, setCurrentAccount] = useState<StoredUserAccount | null>(() => {
     const activeUserId = getActiveSessionUserId();
-    if (activeUserId && !activeUserId.startsWith('demo-')) {
+    if (activeUserId) {
       const profile = getUserProfile(activeUserId);
       if (profile) {
         return {
@@ -46,18 +44,9 @@ export function App() {
     return null;
   });
 
-  const [isDemoMode, setIsDemoMode] = useState<boolean>(() => {
-    const activeUserId = getActiveSessionUserId();
-    return Boolean(activeUserId && activeUserId.startsWith('demo-'));
-  });
-
   const [currentUserProfile, setCurrentUserProfile] = useState<UserProfile | null>(() => {
     const activeUserId = getActiveSessionUserId();
-    if (activeUserId === 'demo-alex-morgan') {
-      return createAlexMorganDemoProfile();
-    } else if (activeUserId === 'demo-aarav-sharma') {
-      return createAaravSharmaDemoProfile();
-    } else if (activeUserId) {
+    if (activeUserId) {
       return getUserProfile(activeUserId);
     }
     return null;
@@ -85,12 +74,11 @@ export function App() {
   const handleAuthSuccess = (account: StoredUserAccount, isNewSignUp: boolean) => {
     setCurrentAccount(account);
     setActiveSession(account.id);
-    setIsDemoMode(false);
     setAuthModalOpen(false);
 
     if (isNewSignUp) {
       setCurrentUserProfile(null);
-      triggerToast(`Welcome to NEXORA, ${account.fullName}! Let's configure your goal.`);
+      triggerToast(`Welcome to NEXORA, ${account.fullName}! Let's build your personalized path.`);
     } else {
       const existing = getUserProfile(account.id);
       if (existing) {
@@ -103,20 +91,10 @@ export function App() {
     }
   };
 
-  const handleStartDemo = (persona: 'alex' | 'aarav' = 'alex') => {
-    const demoProfile = persona === 'alex' ? createAlexMorganDemoProfile() : createAaravSharmaDemoProfile();
-    setCurrentUserProfile(demoProfile);
-    setIsDemoMode(true);
-    setActiveSession(demoProfile.id);
-    setActiveTab('dashboard');
-    triggerToast(`Active Demo: ${demoProfile.fullName} (${demoProfile.goalTitle})`);
-  };
-
   const handleSignOut = () => {
     setActiveSession(null);
     setCurrentAccount(null);
     setCurrentUserProfile(null);
-    setIsDemoMode(false);
     setActiveTab('dashboard');
     triggerToast('You have been securely signed out.');
   };
@@ -129,9 +107,7 @@ export function App() {
   };
 
   const handleUpdateProfile = (updatedProfile: UserProfile) => {
-    if (!isDemoMode) {
-      saveUserProfile(updatedProfile);
-    }
+    saveUserProfile(updatedProfile);
     setCurrentUserProfile(updatedProfile);
     if (updatedProfile.lastPathUpdateReason) {
       triggerToast(updatedProfile.lastPathUpdateReason);
@@ -167,7 +143,6 @@ export function App() {
             activeTab={activeTab}
             onSelectTab={handleNavigateWithPayload}
             onOpenAuth={handleOpenAuth}
-            onStartDemo={handleStartDemo}
             onSignOut={handleSignOut}
           />
 
@@ -184,18 +159,16 @@ export function App() {
               // Public Landing Page
               <LandingPage
                 onOpenAuth={handleOpenAuth}
-                onStartDemo={handleStartDemo}
               />
             )}
           </main>
 
           <Footer 
             onOpenAuth={handleOpenAuth}
-            onStartDemo={handleStartDemo}
           />
         </div>
       ) : (
-        // AUTHENTICATED FULL-SCREEN WORKSPACE WITH PINNED SIDEBAR (NO TOP NAVBAR)
+        // AUTHENTICATED FULL-SCREEN WORKSPACE WITH PINNED SIDEBAR
         <div className="flex h-screen w-screen overflow-hidden bg-black text-slate-100">
           
           {/* Pinned Left Sidebar */}
@@ -209,35 +182,6 @@ export function App() {
           {/* Full-bleed Scrollable Main Content */}
           <main className="flex-1 h-screen overflow-y-auto bg-black p-4 sm:p-8">
             
-            {/* Demo Mode Notice Bar */}
-            {isDemoMode && (
-              <div className="mb-6 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2 text-amber-300">
-                  <span className="font-bold px-2 py-0.5 rounded bg-amber-500/20 uppercase tracking-wider text-[10px]">
-                    Live Demo Mode
-                  </span>
-                  <span>
-                    Simulated profile: <strong>{currentUserProfile.fullName}</strong> ({currentUserProfile.goalTitle})
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleStartDemo(currentUserProfile.fullName.includes('Alex') ? 'aarav' : 'alex')}
-                    className="px-3 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-semibold transition-colors"
-                  >
-                    Switch to {currentUserProfile.fullName.includes('Alex') ? 'Aarav (JEE / Class 10)' : 'Alex (B.Tech SWE)'}
-                  </button>
-                  <button
-                    onClick={handleSignOut}
-                    className="px-3 py-1 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition-colors"
-                  >
-                    Exit Demo
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Active Workspace View */}
             <div className="w-full min-w-0">
               {activeTab === 'dashboard' && (

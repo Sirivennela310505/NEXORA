@@ -14,10 +14,9 @@ import { InteractiveGlobeConstellation } from './InteractiveGlobeConstellation';
 
 interface LandingPageProps {
   onOpenAuth: (mode: 'signin' | 'signup') => void;
-  onStartDemo: (persona?: 'alex' | 'aarav') => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onStartDemo }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth }) => {
   return (
     <div className="relative min-h-screen bg-black text-slate-100 overflow-hidden font-sans selection:bg-brand-500 selection:text-white">
       
@@ -54,18 +53,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onStartDem
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
               <button
                 onClick={() => onOpenAuth('signup')}
-                className="px-7 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-xl shadow-brand-600/25 hover:shadow-brand-500/40 transition-all flex items-center justify-center gap-2 group"
+                className="px-8 py-3.5 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-sm shadow-xl shadow-cyan-500/25 transition-all flex items-center justify-center gap-2 group"
               >
-                <span>Start Your Free Roadmap</span>
+                <span>Get Started Free</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </button>
 
               <button
-                onClick={() => onStartDemo('alex')}
-                className="px-6 py-3.5 rounded-2xl bg-black hover:bg-zinc-900 text-slate-200 hover:text-white font-semibold text-sm border border-white/[0.12] hover:border-brand-400 transition-all flex items-center justify-center gap-2"
+                onClick={() => onOpenAuth('signin')}
+                className="px-7 py-3.5 rounded-2xl bg-black hover:bg-zinc-900 text-slate-200 hover:text-white font-semibold text-sm border border-white/[0.12] hover:border-white/[0.25] transition-all flex items-center justify-center gap-2"
               >
-                <Sparkles className="w-4 h-4 text-brand-400" />
-                <span>Try Live Demo</span>
+                <span>Sign In to Account</span>
               </button>
             </div>
 
@@ -180,7 +178,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onStartDem
             
             {/* Track 1 */}
             <div 
-              onClick={() => onStartDemo('alex')}
+              onClick={() => onOpenAuth('signup')}
               className="p-6 rounded-3xl bg-zinc-950 border border-white/[0.08] hover:border-blue-500/50 transition-all cursor-pointer space-y-3 text-left group"
             >
               <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
@@ -193,14 +191,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onStartDem
                 Arrays, Trees, Dynamic Programming, and High-Scale System Design for interviews.
               </p>
               <div className="pt-2 flex items-center gap-1.5 text-xs text-blue-400 font-semibold">
-                <span>View Track</span>
+                <span>Start Free Track</span>
                 <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
             {/* Track 2 */}
             <div 
-              onClick={() => onStartDemo('aarav')}
+              onClick={() => onOpenAuth('signup')}
               className="p-6 rounded-3xl bg-zinc-950 border border-white/[0.08] hover:border-amber-500/50 transition-all cursor-pointer space-y-3 text-left group"
             >
               <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
@@ -213,7 +211,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onStartDem
                 Mechanics, Calculus, Organic Chemistry, and Thermodynamics with deep foundations.
               </p>
               <div className="pt-2 flex items-center gap-1.5 text-xs text-amber-400 font-semibold">
-                <span>View Track</span>
+                <span>Start Free Track</span>
                 <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
