@@ -81,8 +81,11 @@ export const PersonalizedOnboardingFlow: React.FC<PersonalizedOnboardingFlowProp
     ];
   }, [educationLevel]);
 
-  // Dynamic Struggle / Bottleneck options based on Education Level & Goal
+  // Dynamic Struggle / Bottleneck options — goal-title-aware for precise personalization
   const struggleOptions = React.useMemo(() => {
+    const titleLower = goalTitle.toLowerCase();
+
+    // Class 10 Board
     if (educationLevel === 'Class 10') {
       return [
         'Trigonometric Identities & Polynomial Formulas',
@@ -93,6 +96,8 @@ export const PersonalizedOnboardingFlow: React.FC<PersonalizedOnboardingFlowProp
         'Solving Application & Word Problems Independently'
       ];
     }
+
+    // JEE / NEET / Class 12
     if (educationLevel === 'Class 12' || goalCategory === 'jee' || goalCategory === 'neet') {
       return [
         'Calculus: Definite Integrals & Differential Equations',
@@ -103,7 +108,57 @@ export const PersonalizedOnboardingFlow: React.FC<PersonalizedOnboardingFlowProp
         'Negative Marking & Exam Speed in Mock Tests'
       ];
     }
-    if (educationLevel === 'Undergraduate' || goalCategory === 'internship' || goalCategory === 'swe') {
+
+    // Cloud & DevOps Engineer
+    if (titleLower.includes('cloud') || titleLower.includes('devops') || titleLower.includes('kubernetes') || titleLower.includes('docker')) {
+      return [
+        'Setting up CI/CD Pipelines (GitHub Actions, Jenkins)',
+        'Kubernetes Cluster Management & Pod Networking',
+        'AWS / GCP / Azure Core Services & IAM Policies',
+        'Writing Dockerfiles & Multi-Stage Container Builds',
+        'Infrastructure as Code with Terraform & Ansible',
+        'Monitoring & Alerting with Prometheus & Grafana'
+      ];
+    }
+
+    // Data Engineering & Analytics
+    if (titleLower.includes('data engineer') || titleLower.includes('analytics') || titleLower.includes('spark') || goalCategory === 'data_science') {
+      return [
+        'Complex SQL Queries, Window Functions & Query Optimization',
+        'Building ETL / ELT Pipelines with Apache Spark or Airflow',
+        'Data Warehousing Concepts (Star Schema, Fact & Dimension Tables)',
+        'Real-Time Streaming with Kafka & Flink',
+        'Python for Data Engineering (Pandas, PySpark, dbt)',
+        'Cloud Data Platforms (BigQuery, Snowflake, Redshift)'
+      ];
+    }
+
+    // AI / Machine Learning
+    if (goalCategory === 'ai_ml' || titleLower.includes('ai') || titleLower.includes('machine learning') || titleLower.includes('llm')) {
+      return [
+        'Linear Algebra & Matrix Operations for ML',
+        'Backpropagation & Neural Network Architecture',
+        'Implementing ML Models from Scratch (without sklearn)',
+        'Statistics & Bayesian Probability for AI',
+        'Fine-Tuning LLMs & Prompt Engineering',
+        'Deploying AI Models to Production (FastAPI, Docker, Cloud)'
+      ];
+    }
+
+    // Career Switch / Non-Tech
+    if (goalCategory === 'career_switch' || titleLower.includes('switch') || titleLower.includes('transition') || titleLower.includes('non-tech')) {
+      return [
+        'Learning Programming Fundamentals from Absolute Zero',
+        'Building a Portfolio with Real Projects',
+        'Understanding Data Structures & CS Theory Basics',
+        'Overcoming Imposter Syndrome & Staying Consistent',
+        'Choosing the Right Tech Stack to Learn First',
+        'Getting First Freelance or Entry-Level Job'
+      ];
+    }
+
+    // SWE Internship / Placement
+    if (goalCategory === 'internship' || goalCategory === 'swe' || titleLower.includes('placement') || titleLower.includes('internship') || titleLower.includes('backend') || titleLower.includes('full-stack')) {
       return [
         'Java / Spring Boot Microservices & Database Indexing',
         'Solving Medium/Hard LeetCode DSA Problems independently',
@@ -113,14 +168,17 @@ export const PersonalizedOnboardingFlow: React.FC<PersonalizedOnboardingFlowProp
         'Resume Shortlisting & Tech Placement Coding Rounds'
       ];
     }
+
+    // Default fallback
     return [
-      'Learning Programming Fundamentals from Zero',
       'Understanding Database Schemas, Indexing & REST APIs',
-      'Deploying Full-Stack Code to Production (Vercel/Render)',
-      'Staying Consistent with Daily Coding Habit',
-      'Building Portfolio Projects that Impress Recruiters'
+      'Deploying Code to Production (Vercel/Render/AWS)',
+      'Staying Consistent with Daily Learning Habit',
+      'Building Portfolio Projects that Impress Recruiters',
+      'Debugging & Reading Error Messages Confidently',
+      'Writing Clean, Maintainable & Tested Code'
     ];
-  }, [educationLevel, goalCategory]);
+  }, [educationLevel, goalCategory, goalTitle]);
 
   // Speech to Text handler
   const handleToggleVoice = () => {
