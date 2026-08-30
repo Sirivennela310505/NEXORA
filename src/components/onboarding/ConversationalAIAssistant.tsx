@@ -349,12 +349,17 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
     setTimeout(() => setGenerationStep(4), 2200);
 
     const buildProfile = async () => {
-      const isJEE = capturedCategory === 'jee' || capturedEducation === 'Class 10' || capturedEducation === 'Class 12';
-      const goalCat = isJEE ? 'jee' : capturedCategory;
-      const goalTitle = capturedGoal || (isJEE ? 'Crack JEE Main & Advanced' : 'Software Engineering Internship');
-      const isCustomGoal = !['jee','neet','swe','internship','ai_ml','career_switch'].includes(goalCat);
+      let goalCat: GoalCategory = capturedCategory;
+      const lowerGoal = (capturedGoal || '').toLowerCase();
+      if (lowerGoal.includes('jee') || lowerGoal.includes('iit')) goalCat = 'jee';
+      else if (lowerGoal.includes('neet') || lowerGoal.includes('medical') || lowerGoal.includes('doctor')) goalCat = 'neet';
+      else if (lowerGoal.includes('ai') || lowerGoal.includes('machine learning') || lowerGoal.includes('ml')) goalCat = 'ai_ml';
+      else if (lowerGoal.includes('internship') || lowerGoal.includes('placement')) goalCat = 'internship';
+      else if (lowerGoal.includes('switch') || lowerGoal.includes('transition')) goalCat = 'career_switch';
+      else if (lowerGoal.includes('data science') || lowerGoal.includes('data engineer')) goalCat = 'data_science';
 
-      const skills = initializeSkillsForGoal(goalCat);
+      const goalTitle = capturedGoal.trim() || 'Software Engineering & Placements';
+      const skills = initializeSkillsForGoal(goalCat, undefined, goalTitle);
 
       const partialProfile: Partial<UserProfile> = {
         id: userId,
@@ -378,12 +383,13 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
         feedbackLog: []
       };
 
-      // For custom goals: use Gemini to generate roadmap; else use static engine
+      // Call Gemini AI for custom/dynamic roadmap milestones or fallback to adaptive engine
       let roadmap;
-      if (isCustomGoal && isGeminiConfigured()) {
+      if (isGeminiConfigured()) {
         try {
           roadmap = await generateRoadmapMilestones(goalTitle, capturedEducation, capturedDailyMinutes);
-        } catch {
+        } catch (e) {
+          console.warn('Gemini roadmap generation fallback:', e);
           roadmap = generatePersonalizedRoadmap(partialProfile);
         }
       } else {
@@ -398,7 +404,7 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
       onComplete(finalProfile);
     };
 
-    setTimeout(() => { buildProfile(); }, 3000);
+    setTimeout(() => { buildProfile(); }, 2600);
   };
 
 

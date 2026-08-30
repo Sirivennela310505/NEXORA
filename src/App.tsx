@@ -4,7 +4,7 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { LandingPage } from './components/landing/LandingPage';
 import { AuthModal } from './components/auth/AuthModal';
-import { PersonalizedOnboardingFlow } from './components/onboarding/PersonalizedOnboardingFlow';
+import { ConversationalAIAssistant } from './components/onboarding/ConversationalAIAssistant';
 import { AppSidebar } from './components/layout/AppSidebar';
 import { DashboardView } from './components/dashboard/DashboardView';
 import { RoadmapView } from './components/roadmap/RoadmapView';
@@ -22,8 +22,7 @@ import {
   getActiveSessionUserId, 
   setActiveSession, 
   getUserProfile, 
-  saveUserProfile,
-  createNewUserDefaultProfile
+  saveUserProfile
 } from './engine/storage';
 import type { StoredUserAccount } from './engine/storage';
 
@@ -49,7 +48,10 @@ export function App() {
   const [currentUserProfile, setCurrentUserProfile] = useState<UserProfile | null>(() => {
     const activeUserId = getActiveSessionUserId();
     if (activeUserId) {
-      return getUserProfile(activeUserId);
+      const profile = getUserProfile(activeUserId);
+      if (profile && profile.onboardingCompleted) {
+        return profile;
+      }
     }
     return null;
   });
@@ -75,23 +77,22 @@ export function App() {
     setAuthModalOpen(true);
   };
 
-  const handleAuthSuccess = (account: StoredUserAccount, isNewSignUp: boolean) => {
+  const handleAuthSuccess = (account: StoredUserAccount, _isNewSignUp: boolean = false) => {
     setCurrentAccount(account);
     setActiveSession(account.id);
     setAuthModalOpen(false);
 
-    let profile = getUserProfile(account.id);
-    if (!profile) {
-      profile = createNewUserDefaultProfile(account);
-    }
-    setCurrentUserProfile(profile);
-    setActiveTab('dashboard');
-    setTabHistory(['dashboard']);
-    
-    if (isNewSignUp) {
-      triggerToast(`Welcome to NEXORA, ${account.fullName}! Your personalized dashboard is active.`);
+    const profile = getUserProfile(account.id);
+    if (profile && profile.onboardingCompleted) {
+      // Existing profile with completed roadmap
+      setCurrentUserProfile(profile);
+      setActiveTab('dashboard');
+      setTabHistory(['dashboard']);
+      triggerToast(`Welcome back, ${account.fullName}!`);
     } else {
-      triggerToast(`Welcome back, ${account.fullName}! Signed in successfully.`);
+      // New user or incomplete onboarding: run AI requirement gathering assistant!
+      setCurrentUserProfile(null);
+      triggerToast(`Welcome to NEXORA, ${account.fullName}! Let's build your personalized AI roadmap.`);
     }
   };
 
@@ -186,8 +187,8 @@ export function App() {
 
           <main className="flex-1">
             {currentAccount ? (
-              // Step-by-Step AI Requirement Gathering & Goal Setup Flow
-              <PersonalizedOnboardingFlow
+              // Conversational AI Requirement Gathering & Goal Setup Flow
+              <ConversationalAIAssistant
                 userFullName={currentAccount.fullName}
                 userEmail={currentAccount.email}
                 userId={currentAccount.id}
