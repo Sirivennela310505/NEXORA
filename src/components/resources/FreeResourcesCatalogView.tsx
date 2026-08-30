@@ -264,11 +264,11 @@ export const FreeResourcesCatalogView: React.FC<FreeResourcesCatalogViewProps> =
         {/* Category Tabs */}
         <div className="pt-2 flex flex-wrap items-center gap-2 border-t border-white/[0.08]">
           {[
-            { id: 'btech_swe', label: '💻 B.Tech & SWE Internships', desc: 'DSA, System Design & Drives' },
-            { id: 'inter_jee', label: '🎓 Intermediate / JEE / NEET', desc: 'Physics, Chemistry & Calculus' },
-            { id: '10th', label: '📚 Class 10th Board Mastery', desc: 'NCERT Math & Science' },
-            { id: 'projects', label: '🚀 Project Blueprints & Portfolio', desc: 'SaaS, Full-Stack & AI' },
-            { id: 'all', label: '🔍 View All Resources', desc: 'Browse Everything' }
+            { id: 'btech_swe', label: 'B.Tech & SWE Internships', desc: 'DSA, System Design & Drives' },
+            { id: 'inter_jee', label: 'Intermediate / JEE / NEET', desc: 'Physics, Chemistry & Calculus' },
+            { id: '10th', label: 'Class 10th Board Mastery', desc: 'NCERT Math & Science' },
+            { id: 'projects', label: 'Project Blueprints & Portfolio', desc: 'SaaS, Full-Stack & AI' },
+            { id: 'all', label: 'View All Resources', desc: 'Browse Everything' }
           ].map((cat) => (
             <button
               key={cat.id}

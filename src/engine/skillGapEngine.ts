@@ -100,10 +100,26 @@ export function calculateSkillGaps(
   };
 }
 
-export function getDomainKeyForGoal(goal: GoalCategory, educationLevel?: string): string {
+export function getDomainKeyForGoal(goal: GoalCategory, educationLevel?: string, goalTitle?: string): string {
   if (educationLevel === 'Class 10' || goal === 'academic') {
     return 'class10';
   }
+  if (goalTitle) {
+    const t = goalTitle.toLowerCase();
+    if (t.includes('java') || t.includes('spring') || t.includes('hibernate')) {
+      return 'java_backend';
+    }
+    if (t.includes('ai') || t.includes('ml') || t.includes('machine learning') || t.includes('data science') || t.includes('deep learning')) {
+      return 'ai_ml';
+    }
+    if (t.includes('10th') || t.includes('class 10')) {
+      return 'class10';
+    }
+    if (t.includes('jee') || t.includes('neet') || t.includes('iit') || t.includes('12th')) {
+      return 'jee';
+    }
+  }
+
   switch (goal) {
     case 'jee':
     case 'neet':

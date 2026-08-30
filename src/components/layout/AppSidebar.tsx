@@ -8,7 +8,8 @@ import {
   Bot, 
   Sliders,
   LogOut,
-  Trophy
+  Trophy,
+  X
 } from 'lucide-react';
 import { NexoraLogo } from '../common/NexoraLogo';
 import type { UserProfile } from '../../engine/types';
@@ -18,13 +19,17 @@ interface AppSidebarProps {
   onSelectTab: (tabId: string) => void;
   profile: UserProfile;
   onSignOut: () => void;
+  isOpenMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export const AppSidebar: React.FC<AppSidebarProps> = ({
   activeTab,
   onSelectTab,
   profile,
-  onSignOut
+  onSignOut,
+  isOpenMobile = false,
+  onCloseMobile
 }) => {
   const isTechStudent = profile.goalCategory === 'internship' || profile.goalCategory === 'swe' || profile.educationLevel === 'Undergraduate' || profile.goalCategory === 'career_switch';
 
@@ -39,7 +44,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       id: 'roadmap',
       label: 'Flowchart Roadmap',
       icon: GitBranch,
-      badge: 'Single Flow'
+      badge: 'Prerequisite DAG'
     },
     {
       id: 'resources',
@@ -75,18 +80,36 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     }
   ];
 
-  return (
-    <aside className="w-64 lg:w-72 h-screen shrink-0 bg-black border-r border-white/[0.08] flex flex-col justify-between p-4 selection:bg-brand-500 selection:text-white sticky top-0 overflow-y-auto">
-      
-      {/* Top Section: Logo & Profile */}
+  const handleTabClick = (id: string) => {
+    onSelectTab(id);
+    if (onCloseMobile) {
+      onCloseMobile();
+    }
+  };
+
+  const sidebarContent = (
+    <div className="w-72 h-full bg-black border-r border-white/[0.08] flex flex-col justify-between p-4 selection:bg-brand-500 selection:text-white overflow-y-auto">
+      {/* Top Section: Logo, Mobile Close & Profile */}
       <div className="space-y-5">
         
-        {/* Brand Logo */}
+        {/* Brand Logo Header */}
         <div className="px-2 py-2 border-b border-white/[0.06] flex items-center justify-between">
           <NexoraLogo size="sm" />
-          <span className="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
-            PRO
-          </span>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
+              PRO
+            </span>
+            {onCloseMobile && (
+              <button
+                onClick={onCloseMobile}
+                className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-zinc-900 transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Student Mini Profile Box */}
@@ -103,7 +126,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
           <div className="p-2 rounded-xl bg-black border border-white/[0.06] text-[11px] space-y-0.5">
             <div className="flex items-center justify-between text-slate-400">
-              <span>Goal:</span>
+              <span>Target:</span>
               <span className="text-cyan-400 font-bold">{profile.dailyAvailabilityMinutes}m/day</span>
             </div>
             <div className="font-semibold text-slate-200 truncate text-[11px]">{profile.goalTitle}</div>
@@ -119,7 +142,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             return (
               <button
                 key={item.id}
-                onClick={() => onSelectTab(item.id)}
+                onClick={() => handleTabClick(item.id)}
                 className={`w-full p-3 rounded-2xl text-xs font-bold transition-all flex items-center justify-between gap-3 text-left ${
                   isActive
                     ? 'bg-white text-black shadow-lg shadow-white/10 font-extrabold scale-[1.01]'
@@ -157,7 +180,30 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           <span>Sign Out</span>
         </button>
       </div>
+    </div>
+  );
 
-    </aside>
+  return (
+    <>
+      {/* Desktop Sticky Sidebar */}
+      <aside className="hidden md:flex h-screen shrink-0 sticky top-0 z-30">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer with Backdrop */}
+      {isOpenMobile && (
+        <div className="fixed inset-0 z-50 md:hidden flex animate-fade-in">
+          {/* Backdrop overlay */}
+          <div 
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={onCloseMobile}
+          />
+          {/* Sliding Content */}
+          <div className="relative z-50 h-full max-w-[85vw] shadow-2xl animate-slide-right">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 };

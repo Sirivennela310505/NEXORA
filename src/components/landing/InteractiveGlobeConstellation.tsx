@@ -33,14 +33,14 @@ export const InteractiveGlobeConstellation: React.FC = () => {
 
     // Problem-Statement Solution Nodes (Goal finding, clear paths, skill gaps, free lessons)
     const keyTopics: { name: string; color: string; glow: string }[] = [
-      { name: '🎯 Find Goal by Interest', color: '#00f2fe', glow: 'rgba(0, 242, 254, 0.9)' },
-      { name: '🗺️ Clear Learning Paths', color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.9)' },
-      { name: '⚡ Diagnostic Skill Check', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.9)' },
-      { name: '🧩 Bridge Foundation Gaps', color: '#f43f5e', glow: 'rgba(244, 63, 94, 0.9)' },
-      { name: '🎥 Free Video Lessons', color: '#10b981', glow: 'rgba(16, 185, 129, 0.9)' },
-      { name: '📊 Interactive Flowchart', color: '#a855f7', glow: 'rgba(168, 85, 247, 0.9)' },
-      { name: '🚀 Next Best Daily Action', color: '#6366f1', glow: 'rgba(99, 102, 241, 0.9)' },
-      { name: '🎓 College & Career Readiness', color: '#14b8a6', glow: 'rgba(20, 184, 166, 0.9)' }
+      { name: 'Goal Discovery & Profiling', color: '#00f2fe', glow: 'rgba(0, 242, 254, 0.9)' },
+      { name: 'Prerequisite Learning Paths', color: '#38bdf8', glow: 'rgba(56, 189, 248, 0.9)' },
+      { name: 'Diagnostic Skill Benchmarks', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.9)' },
+      { name: 'Automated Gap Remediation', color: '#f43f5e', glow: 'rgba(244, 63, 94, 0.9)' },
+      { name: 'Verified Free Masterclasses', color: '#10b981', glow: 'rgba(16, 185, 129, 0.9)' },
+      { name: 'Interactive Flowchart DAG', color: '#a855f7', glow: 'rgba(168, 85, 247, 0.9)' },
+      { name: 'Next Best Daily Action', color: '#6366f1', glow: 'rgba(99, 102, 241, 0.9)' },
+      { name: 'Placement & Career Tracking', color: '#14b8a6', glow: 'rgba(20, 184, 166, 0.9)' }
     ];
 
     const particleCount = 85;

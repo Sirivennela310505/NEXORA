@@ -189,6 +189,95 @@ export const DOMAIN_SKILL_NODES: Record<string, SkillNode[]> = {
     }
   ],
 
+  // JAVA BACKEND DEVELOPER (SPRING BOOT & MICROSERVICES)
+  java_backend: [
+    {
+      id: 'java-core-jvm',
+      name: 'Core Java, OOP & JVM Architecture',
+      category: 'Core Language',
+      domain: 'java_backend',
+      description: 'OOP Principles, Memory Model (Heap/Stack), Garbage Collection, Exception Handling & Multithreading.',
+      prerequisites: [],
+      targetMasteryForGoal: 85,
+    },
+    {
+      id: 'java-collections-streams',
+      name: 'Java Collections Framework & Streams API',
+      category: 'Core Language',
+      domain: 'java_backend',
+      description: 'HashMap, ConcurrentHashMap, ArrayList, LinkedList, Functional Interfaces, Lambdas & Parallel Streams.',
+      prerequisites: ['java-core-jvm'],
+      targetMasteryForGoal: 85,
+    },
+    {
+      id: 'java-spring-boot-core',
+      name: 'Spring Boot & RESTful Microservices',
+      category: 'Framework',
+      domain: 'java_backend',
+      description: 'Dependency Injection, Inversion of Control (IoC), Spring MVC, REST Controllers & Validation.',
+      prerequisites: ['java-collections-streams'],
+      targetMasteryForGoal: 80,
+    },
+    {
+      id: 'java-jpa-hibernate',
+      name: 'Spring Data JPA & Hibernate ORM',
+      category: 'Database & ORM',
+      domain: 'java_backend',
+      description: 'Entity Relationships (@OneToMany, @ManyToMany), Transaction Management (@Transactional), N+1 Problem & QueryDSL.',
+      prerequisites: ['java-spring-boot-core'],
+      targetMasteryForGoal: 80,
+    },
+    {
+      id: 'java-microservices-kafka',
+      name: 'Microservices, Docker & Apache Kafka',
+      category: 'Distributed Systems',
+      domain: 'java_backend',
+      description: 'Service Discovery (Eureka), API Gateway, Distributed Tracing, Event-Driven Messaging with Kafka & Dockerization.',
+      prerequisites: ['java-jpa-hibernate'],
+      targetMasteryForGoal: 75,
+    }
+  ],
+
+  // AI & MACHINE LEARNING / LLM PIPELINES
+  ai_ml: [
+    {
+      id: 'aiml-math-python',
+      name: 'Python for AI & Linear Algebra Foundations',
+      category: 'Foundations',
+      domain: 'ai_ml',
+      description: 'NumPy vectorized math, Matrix decompositions (SVD/Eigenvalues), Pandas DataFrames & Exploratory Data Analysis.',
+      prerequisites: [],
+      targetMasteryForGoal: 85,
+    },
+    {
+      id: 'aiml-classical-ml',
+      name: 'Supervised & Unsupervised Machine Learning',
+      category: 'Machine Learning',
+      domain: 'ai_ml',
+      description: 'Linear/Logistic Regression, Random Forests, XGBoost, Cross-Validation, ROC-AUC, and Feature Engineering.',
+      prerequisites: ['aiml-math-python'],
+      targetMasteryForGoal: 80,
+    },
+    {
+      id: 'aiml-deeplearning-pytorch',
+      name: 'Deep Learning & PyTorch Architecture',
+      category: 'Deep Learning',
+      domain: 'ai_ml',
+      description: 'Backpropagation, Neural Network layers, CNNs for vision, RNNs/Transformers & PyTorch training loops.',
+      prerequisites: ['aiml-classical-ml'],
+      targetMasteryForGoal: 80,
+    },
+    {
+      id: 'aiml-llm-rag',
+      name: 'Generative AI, LangChain & Vector RAG',
+      category: 'Generative AI',
+      domain: 'ai_ml',
+      description: 'Transformer Attention mechanism, Prompt Engineering, LangChain / LlamaIndex, Vector DBs (Pinecone/Chroma) & Fine-Tuning.',
+      prerequisites: ['aiml-deeplearning-pytorch'],
+      targetMasteryForGoal: 75,
+    }
+  ],
+
   // JEE MAIN & ADVANCED (CLASS 11/12 HIGH-LEVEL EXAM PATHWAY)
   jee: [
     {

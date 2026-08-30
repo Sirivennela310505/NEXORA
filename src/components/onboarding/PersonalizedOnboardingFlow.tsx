@@ -65,15 +65,19 @@ export const PersonalizedOnboardingFlow: React.FC<PersonalizedOnboardingFlowProp
     }
     if (educationLevel === 'Undergraduate') {
       return [
-        { title: 'B.Tech SWE Placements & Internships', cat: 'internship' as GoalCategory, desc: 'Core DSA (NeetCode 150), System Design & Mock Interviews' },
-        { title: 'Full-Stack Web & Systems Developer', cat: 'swe' as GoalCategory, desc: 'React, Node/Express, PostgreSQL, and Cloud Deployment' },
-        { title: 'AI / Machine Learning Engineer', cat: 'ai_ml' as GoalCategory, desc: 'Linear Algebra, Neural Networks, PyTorch & LLM Pipelines' }
+        { title: 'Java Backend & Microservices Developer', cat: 'swe' as GoalCategory, desc: 'Core Java, Spring Boot, Hibernate ORM, REST APIs, Kafka & MySQL' },
+        { title: 'B.Tech SWE Placements & Internships', cat: 'internship' as GoalCategory, desc: 'Core DSA (NeetCode 150), System Design & Top Tech Interviews' },
+        { title: 'Full-Stack Web & Systems Developer', cat: 'swe' as GoalCategory, desc: 'React, Node/Express, TypeScript, PostgreSQL & Cloud Deployment' },
+        { title: 'AI / Machine Learning & LLM Engineer', cat: 'ai_ml' as GoalCategory, desc: 'NumPy, PyTorch, Neural Networks, LangChain & Vector RAG' },
+        { title: 'Cloud & DevOps Engineer', cat: 'swe' as GoalCategory, desc: 'Docker, Kubernetes, CI/CD Pipelines, AWS & Microservices' },
+        { title: 'Data Engineer & Analytics Specialist', cat: 'data_science' as GoalCategory, desc: 'Advanced SQL, Python ETL, Apache Spark, Kafka & Data Warehousing' }
       ];
     }
     return [
       { title: 'Full-Stack Production Project Builder', cat: 'career_switch' as GoalCategory, desc: 'Build and deploy scalable portfolio applications' },
       { title: 'Non-Tech to Software Engineering Transition', cat: 'career_switch' as GoalCategory, desc: 'Zero-to-one programming fundamentals & data structures' },
-      { title: 'System Architecture & Cloud Backend', cat: 'swe' as GoalCategory, desc: 'Distributed microservices, Docker, Redis & PostgreSQL' }
+      { title: 'Java & Cloud Backend Engineering', cat: 'swe' as GoalCategory, desc: 'Spring Boot, Distributed Microservices, Docker & Redis' },
+      { title: 'Applied AI Systems & Agentic Engineering', cat: 'ai_ml' as GoalCategory, desc: 'FastAPI, LLM Fine-Tuning, Multi-Agent Systems & Vector Search' }
     ];
   }, [educationLevel]);
 
@@ -101,12 +105,12 @@ export const PersonalizedOnboardingFlow: React.FC<PersonalizedOnboardingFlowProp
     }
     if (educationLevel === 'Undergraduate' || goalCategory === 'internship' || goalCategory === 'swe') {
       return [
+        'Java / Spring Boot Microservices & Database Indexing',
         'Solving Medium/Hard LeetCode DSA Problems independently',
         'Dynamic Programming & Graph Traversal Patterns',
         'High-Scale System Design, Caching & Database Sharding',
         'Building Full-Stack projects with clean backend architecture',
-        'Resume Shortlisting & Tech Placement Coding Rounds',
-        'Time Management between College Exams & Coding Practice'
+        'Resume Shortlisting & Tech Placement Coding Rounds'
       ];
     }
     return [
@@ -164,6 +168,8 @@ export const PersonalizedOnboardingFlow: React.FC<PersonalizedOnboardingFlowProp
     setTimeout(() => {
       setIsAnalyzing(false);
 
+      const customInput = naturalLanguageGoal.toLowerCase().trim();
+
       if (educationLevel === 'Class 10') {
         setRecommendedTracks([
           {
@@ -185,7 +191,7 @@ export const PersonalizedOnboardingFlow: React.FC<PersonalizedOnboardingFlowProp
         setRecommendedTracks([
           {
             id: 'jee-crash-target',
-            title: 'JEE Main & Advanced 2026/2027 Mastery Path',
+            title: 'JEE Main & Advanced Mastery Path',
             category: 'jee',
             desc: 'Calculus, Rotational Mechanics, and Organic Chemistry with prerequisite diagnostic remediation.',
             matchScore: 98
@@ -198,13 +204,66 @@ export const PersonalizedOnboardingFlow: React.FC<PersonalizedOnboardingFlowProp
             matchScore: 92
           }
         ]);
+      } else if (customInput.includes('java') || goalTitle.includes('Java')) {
+        setRecommendedTracks([
+          {
+            id: 'java-backend-track',
+            title: 'Java Backend & Spring Boot Microservices Specialist',
+            category: 'swe',
+            desc: 'Core Java, OOP/JVM, Spring Boot, Hibernate ORM, REST APIs, Kafka, MySQL & Docker containerization.',
+            matchScore: 99
+          },
+          {
+            id: 'swe-internship',
+            title: 'B.Tech SWE Placements & Core Java DSA',
+            category: 'internship',
+            desc: 'NeetCode 150 DSA in Java, System Design & top tech placement rounds.',
+            matchScore: 94
+          }
+        ]);
+      } else if (customInput.includes('ai') || customInput.includes('ml') || goalTitle.includes('AI')) {
+        setRecommendedTracks([
+          {
+            id: 'aiml-track',
+            title: 'AI / Machine Learning & Generative AI Engineer',
+            category: 'ai_ml',
+            desc: 'NumPy, Linear Algebra, PyTorch Neural Networks, LangChain & Vector RAG Pipelines.',
+            matchScore: 99
+          },
+          {
+            id: 'fullstack-dev',
+            title: 'Full-Stack AI Application Developer',
+            category: 'swe',
+            desc: 'FastAPI backend, React frontend, OpenAI/Claude APIs & cloud deployment.',
+            matchScore: 92
+          }
+        ]);
+      } else if (customInput.length > 3) {
+        // Dynamic track matching user's exact typed aspiration
+        const formattedTitle = naturalLanguageGoal.charAt(0).toUpperCase() + naturalLanguageGoal.slice(1);
+        setRecommendedTracks([
+          {
+            id: 'custom-user-track',
+            title: formattedTitle.includes('Developer') || formattedTitle.includes('Engineer') ? formattedTitle : `${formattedTitle} Mastery Track`,
+            category: 'swe',
+            desc: `Custom synthesized prerequisite roadmap tailored for ${formattedTitle} with structured practice.`,
+            matchScore: 99
+          },
+          {
+            id: 'swe-internship',
+            title: 'B.Tech SWE Placements & Tech Readiness',
+            category: 'internship',
+            desc: 'Core DSA (NeetCode 150), System Design, and resume interview readiness.',
+            matchScore: 92
+          }
+        ]);
       } else {
         setRecommendedTracks([
           {
             id: 'swe-internship',
-            title: 'B.Tech SWE Placements & Top Tech Internships',
-            category: 'internship',
-            desc: 'Core DSA roadmap (Two Pointers, Trees, Graphs, DP), System Design, and resume interview readiness.',
+            title: goalTitle,
+            category: goalCategory,
+            desc: 'Structured prerequisite roadmap with verified video lessons, practice problems, and diagnostic checkpoints.',
             matchScore: 98
           },
           {

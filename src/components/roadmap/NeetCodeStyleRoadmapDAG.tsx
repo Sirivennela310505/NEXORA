@@ -327,24 +327,25 @@ export const NeetCodeStyleRoadmapDAG: React.FC<NeetCodeStyleRoadmapDAGProps> = (
     <div className="w-full min-h-screen bg-[#070a12] text-slate-100 flex flex-col font-sans select-none pb-24">
       
       {/* ================= TOP DARK HUD HEADER ================= */}
-      <div className="border-b border-slate-800/80 bg-[#080d18]/90 backdrop-blur-xl sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xl">
+      {/* TOP HEADER BAR (PURE OBSIDIAN BLACK) */}
+      <div className="border-b border-white/[0.08] bg-black/90 backdrop-blur-xl sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xl">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
           {/* Left: Title & Track Selector Pills */}
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 pr-3 border-r border-slate-800">
-              <div className="w-8 h-8 rounded-xl bg-brand-500/20 border border-brand-500/40 flex items-center justify-center text-brand-400 font-black text-sm">
+            <div className="flex items-center gap-2 pr-3 border-r border-white/[0.08]">
+              <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-extrabold text-sm shadow-md shadow-cyan-500/10">
                 N
               </div>
               <span className="font-extrabold text-white text-base tracking-tight hidden sm:inline">
-                NEXORA <span className="text-brand-400">Flowchart</span>
+                NEXORA <span className="text-cyan-400">Flowchart</span>
               </span>
             </div>
 
             {/* Track Switchers / Track Badge */}
             {profile.goalCategory === 'jee' || profile.goalCategory === 'neet' || profile.educationLevel === 'Class 10' || profile.educationLevel === 'Class 12' ? (
               <div className="px-3.5 py-1.5 rounded-xl bg-zinc-900 border border-cyan-500/30 text-xs font-bold text-cyan-300 flex items-center gap-2">
-                <span>🎯 {profile.goalTitle}</span>
+                <span>{profile.goalTitle}</span>
                 <span className="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded-full border border-cyan-500/20">
                   Target Curriculum
                 </span>
@@ -355,33 +356,33 @@ export const NeetCodeStyleRoadmapDAG: React.FC<NeetCodeStyleRoadmapDAGProps> = (
                   onClick={() => setActiveTrackId('personalized')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     activeTrackId === 'personalized'
-                      ? 'bg-white text-black shadow-lg'
+                      ? 'bg-white text-black shadow-lg font-extrabold'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  <span>🎓 {profile.goalTitle}</span>
+                  <span>{profile.goalTitle}</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTrackId('core-dsa')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     activeTrackId === 'core-dsa'
-                      ? 'bg-white text-black shadow-lg'
+                      ? 'bg-white text-black shadow-lg font-extrabold'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  <span>🚀 Core DSA</span>
+                  <span>Core DSA</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTrackId('system-design')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     activeTrackId === 'system-design'
-                      ? 'bg-white text-black shadow-lg'
+                      ? 'bg-white text-black shadow-lg font-extrabold'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  <span>🏗️ System Design</span>
+                  <span>System Design</span>
                 </button>
               </div>
             )}

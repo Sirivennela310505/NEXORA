@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Home, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Home, ChevronRight, Menu } from 'lucide-react';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { LandingPage } from './components/landing/LandingPage';
@@ -59,6 +59,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [tabHistory, setTabHistory] = useState<string[]>(['dashboard']);
   const [tabPayload, setTabPayload] = useState<any>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   // Notification Banner
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -123,6 +124,7 @@ export function App() {
     setTabHistory(prev => (prev[prev.length - 1] === tabId ? prev : [...prev, tabId]));
     setActiveTab(tabId);
     setTabPayload(payload);
+    setIsMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -207,20 +209,31 @@ export function App() {
         // AUTHENTICATED FULL-SCREEN WORKSPACE WITH PINNED SIDEBAR & GLOBAL BACK BAR
         <div className="flex h-screen w-screen overflow-hidden bg-black text-slate-100">
           
-          {/* Pinned Left Sidebar */}
+          {/* Pinned Left Sidebar / Mobile Overlay Drawer */}
           <AppSidebar
             activeTab={activeTab}
             onSelectTab={handleNavigateWithPayload}
             profile={currentUserProfile}
             onSignOut={handleSignOut}
+            isOpenMobile={isMobileMenuOpen}
+            onCloseMobile={() => setIsMobileMenuOpen(false)}
           />
 
           {/* Full-bleed Scrollable Main Content */}
           <main className="flex-1 h-screen overflow-y-auto bg-black flex flex-col">
             
-            {/* Top Global Back & Breadcrumb Bar */}
+            {/* Top Global Back, Mobile Menu & Breadcrumb Bar */}
             <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-white/[0.08] px-4 sm:px-8 py-3 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
+                {/* Mobile Menu Button (Hamburger) */}
+                <button
+                  onClick={() => setIsMobileMenuOpen(true)}
+                  className="md:hidden p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-white/[0.1] text-slate-300 hover:text-white transition-colors"
+                  aria-label="Open sidebar menu"
+                >
+                  <Menu className="w-4 h-4 text-cyan-400" />
+                </button>
+
                 {activeTab !== 'dashboard' ? (
                   <button
                     onClick={handleGoBack}
@@ -233,7 +246,7 @@ export function App() {
                 ) : (
                   <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
                     <Home className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Home Dashboard</span>
+                    <span className="hidden sm:inline">Home Dashboard</span>
                   </div>
                 )}
 
