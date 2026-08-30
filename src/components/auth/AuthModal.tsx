@@ -267,33 +267,65 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-md bg-[#0c101c] border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-md bg-[#0c101c] border border-slate-800/90 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5 text-slate-100">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+          className="absolute top-5 right-5 p-1.5 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* Modal Header */}
+        {/* Header Logo & Title */}
         <div className="text-center space-y-2">
           <div className="flex justify-center">
             <NexoraLogo size="sm" showText={false} />
           </div>
           <h3 className="text-xl font-bold font-display text-white">
-            {googlePromptOpen ? 'Sign in with Google' : mode === 'signup' ? 'Create your NEXORA account' : mode === 'signin' ? 'Welcome back to NEXORA' : 'Reset your password'}
+            {googlePromptOpen
+              ? 'Sign in with Google'
+              : phoneMode !== 'idle'
+              ? 'Phone Verification'
+              : mode === 'signup'
+              ? 'Create your NEXORA account'
+              : mode === 'signin'
+              ? 'Welcome back to NEXORA'
+              : 'Reset your password'}
           </h3>
           <p className="text-xs text-slate-400">
-            {googlePromptOpen ? 'Choose an account to continue to NEXORA' : mode === 'signup' ? 'Join serious learners charting adaptive career paths.' : mode === 'signin' ? 'Sign in to access your personalized roadmap.' : 'Enter your verified email to receive a password reset link.'}
+            {googlePromptOpen
+              ? 'Choose a Google account to continue to NEXORA'
+              : phoneMode !== 'idle'
+              ? 'Enter your 10-digit mobile number for instant OTP verification'
+              : mode === 'signup'
+              ? 'Join serious learners charting adaptive career paths.'
+              : mode === 'signin'
+              ? 'Sign in to access your personalized roadmap & progress.'
+              : 'Enter your verified email to receive a password reset link.'}
           </p>
         </div>
 
-        {/* GOOGLE ACCOUNT CHOOSER SCREEN */}
+        {/* Success Alert */}
+        {successNotice && (
+          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-start gap-2 animate-fade-in">
+            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+            <span>{successNotice}</span>
+          </div>
+        )}
+
+        {/* Error Alert */}
+        {errorMsg && (
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2 animate-fade-in">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {/* VIEW 1: GOOGLE ACCOUNT CHOOSER */}
         {googlePromptOpen ? (
-          <div className="space-y-4 pt-2">
+          <div className="space-y-4 pt-2 animate-fade-in">
             <div className="space-y-2">
               <button
                 type="button"
@@ -309,25 +341,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <div className="text-[11px] text-slate-400">alex.morgan@gmail.com</div>
                   </div>
                 </div>
-                <span className="text-[10px] text-slate-500 group-hover:text-cyan-400">Select →</span>
+                <span className="text-[10px] text-slate-500 group-hover:text-cyan-400 font-semibold">Select →</span>
               </button>
             </div>
 
             <div className="flex items-center gap-3 my-2">
               <div className="flex-1 h-px bg-slate-800" />
-              <span className="text-[10px] text-slate-500">or use another Gmail account</span>
+              <span className="text-[10px] text-slate-500 font-medium">or use another Gmail account</span>
               <div className="flex-1 h-px bg-slate-800" />
             </div>
 
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-300">Your Full Name</label>
+                <label className="text-xs font-semibold text-slate-300">Full Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Sarah Connor"
                   value={customGoogleName}
                   onChange={e => setCustomGoogleName(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                  className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
                 />
               </div>
 
@@ -338,7 +370,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   placeholder="name@gmail.com"
                   value={customGoogleEmail}
                   onChange={e => setCustomGoogleEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                  className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
                 />
               </div>
 
@@ -363,55 +395,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onClick={() => setGooglePromptOpen(false)}
               className="w-full text-xs text-slate-400 hover:text-white text-center pt-2"
             >
-              ← Cancel Google Sign-In
+              ← Back to standard Sign In
             </button>
           </div>
-        ) : (
-          <>
-            {/* Social Login Buttons — shown on signup & signin */}
-            {mode !== 'forgot' && phoneMode === 'idle' && (
-              <div className="space-y-3">
-                {/* Google */}
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white hover:bg-gray-100 text-gray-800 font-semibold text-xs transition-all shadow-md disabled:opacity-50"
-                >
-                  {/* Google SVG icon */}
-                  <svg className="w-4 h-4" viewBox="0 0 48 48">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                  </svg>
-                  Continue with Google
-                </button>
-
-                {/* Phone Number */}
-                <button
-                  type="button"
-                  onClick={() => { setPhoneMode('phone'); setErrorMsg(''); setSuccessNotice(''); }}
-                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold text-xs transition-all"
-                >
-                  <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z" />
-                  </svg>
-                  Continue with Phone Number
-                </button>
-
-                {/* Divider */}
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-slate-800" />
-                  <span className="text-[11px] text-slate-500 font-medium">or continue with email</span>
-                  <div className="flex-1 h-px bg-slate-800" />
-                </div>
-              </div>
-            )}
-
-        {/* Phone OTP UI */}
-        {(phoneMode === 'phone' || phoneMode === 'otp') && mode !== 'forgot' && (
-          <div className="space-y-4">
+        ) : phoneMode !== 'idle' ? (
+          /* VIEW 2: PHONE OTP FLOW */
+          <div className="space-y-4 pt-2 animate-fade-in">
             {phoneMode === 'phone' ? (
               <>
                 <div className="space-y-1">
@@ -421,26 +410,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     placeholder="Full name"
                     value={phoneName}
                     onChange={e => setPhoneName(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                    className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-300">Phone Number</label>
                   <div className="flex gap-2">
-                    <span className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300">+91</span>
+                    <span className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-slate-300 font-mono">+91</span>
                     <input
                       type="tel"
-                      placeholder="10-digit number"
+                      placeholder="10-digit mobile number"
                       value={phoneNumber}
                       onChange={e => setPhoneNumber(e.target.value)}
-                      className="flex-1 px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                      className="flex-1 px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
                     />
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={handleSendOtp}
-                  className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs rounded-lg transition-all"
+                  className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-cyan-600/20"
                 >
                   Send OTP
                 </button>
@@ -455,13 +444,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     placeholder="______"
                     value={otpCode}
                     onChange={e => setOtpCode(e.target.value)}
-                    className="w-full text-center tracking-[0.5em] px-3 py-2.5 text-sm bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono"
+                    className="w-full text-center tracking-[0.5em] px-3 py-2.5 text-sm bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={handleVerifyOtp}
-                  className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs rounded-lg transition-all"
+                  className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-cyan-600/20"
                 >
                   Verify & Sign In
                 </button>
@@ -470,266 +459,288 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => { setPhoneMode('idle'); setErrorMsg(''); setSuccessNotice(''); setOtpCode(''); setPhoneNumber(''); }}
-              className="w-full text-xs text-slate-400 hover:text-white text-center"
+              className="w-full text-xs text-slate-400 hover:text-white text-center pt-1"
             >
               ← Back to email sign in
             </button>
           </div>
-        )}
-
-        {/* Success Alert */}
-        {successNotice && (
-          <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-start gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
-            <span>{successNotice}</span>
-          </div>
-        )}
-
-        {/* Error Alert */}
-        {errorMsg && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {/* ---------------- SIGN UP FORM ---------------- */}
-        {mode === 'signup' && (
-          <form onSubmit={handleSignUp} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. John Doe"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                <input
-                  type="email"
-                  required
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="Minimum 6 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-9 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                />
+        ) : (
+          /* VIEW 3: MAIN SIGN IN / SIGN UP / FORGOT PASSWORD */
+          <div className="space-y-4 animate-fade-in">
+            {/* Social Buttons */}
+            {mode !== 'forgot' && (
+              <div className="space-y-3">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
+                  onClick={handleGoogleSignIn}
+                  disabled={isSubmitting}
+                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-white hover:bg-gray-100 text-gray-800 font-semibold text-xs transition-all shadow-md disabled:opacity-50"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <svg className="w-4 h-4" viewBox="0 0 48 48">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                  </svg>
+                  Continue with Google
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setPhoneMode('phone'); setErrorMsg(''); setSuccessNotice(''); }}
+                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold text-xs transition-all"
+                >
+                  <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z" />
+                  </svg>
+                  Continue with Phone Number
+                </button>
+
+                <div className="flex items-center gap-3 py-1">
+                  <div className="flex-1 h-px bg-slate-800" />
+                  <span className="text-[11px] text-slate-500 font-medium">or continue with email</span>
+                  <div className="flex-1 h-px bg-slate-800" />
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Confirm Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="Re-enter password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                />
-              </div>
-            </div>
+            {/* FORM: SIGN UP */}
+            {mode === 'signup' && (
+              <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
+                    />
+                  </div>
+                </div>
 
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <input
-                type="checkbox"
-                id="terms"
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
-              />
-              <label htmlFor="terms">
-                I agree to the <span className="text-slate-200">Terms of Service</span> and <span className="text-slate-200">Privacy Policy</span>
-              </label>
-            </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                    <input
+                      type="email"
+                      required
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
+                    />
+                  </div>
+                </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-lg transition-all shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {isSubmitting ? (
-                <span>Creating Account...</span>
-              ) : (
-                <>
-                  <span>Create Account</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Minimum 6 characters"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-9 pr-9 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Confirm Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Re-enter password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={agreeTerms}
+                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                    className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                  />
+                  <label htmlFor="terms">
+                    I agree to the <span className="text-slate-200">Terms of Service</span> and <span className="text-slate-200">Privacy Policy</span>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <span>Creating Account...</span>
+                  ) : (
+                    <>
+                      <span>Create Account</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+
+            {/* FORM: SIGN IN */}
+            {mode === 'signin' && (
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                    <input
+                      type="email"
+                      required
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-slate-300">Password</label>
+                    <button
+                      type="button"
+                      onClick={() => setMode('forgot')}
+                      className="text-[11px] text-brand-400 hover:text-brand-300"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-9 pr-9 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <span>Signing in...</span>
+                  ) : (
+                    <>
+                      <span>Sign In</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+
+            {/* FORM: FORGOT PASSWORD */}
+            {mode === 'forgot' && (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Registered Email</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                    <input
+                      type="email"
+                      required
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSubmitting ? <span>Processing...</span> : <span>Send Reset Instructions</span>}
+                </button>
+              </form>
+            )}
+
+            {/* Footer Mode Switcher */}
+            <div className="pt-4 border-t border-slate-800/80 text-center text-xs text-slate-400">
+              {mode === 'signup' && (
+                <p>
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => { setMode('signin'); setErrorMsg(''); setSuccessNotice(''); }}
+                    className="text-brand-400 hover:text-brand-300 font-semibold"
+                  >
+                    Sign In
+                  </button>
+                </p>
               )}
-            </button>
-          </form>
-        )}
 
-        {/* ---------------- SIGN IN FORM ---------------- */}
-        {mode === 'signin' && (
-          <form onSubmit={handleSignIn} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                <input
-                  type="email"
-                  required
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-slate-300">Password</label>
-                <button
-                  type="button"
-                  onClick={() => setMode('forgot')}
-                  className="text-[11px] text-brand-400 hover:text-brand-300"
-                >
-                  Forgot password?
-                </button>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-9 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-lg transition-all shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {isSubmitting ? (
-                <span>Signing in...</span>
-              ) : (
-                <>
-                  <span>Sign In</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
+              {mode === 'signin' && (
+                <p>
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => { setMode('signup'); setErrorMsg(''); setSuccessNotice(''); }}
+                    className="text-brand-400 hover:text-brand-300 font-semibold"
+                  >
+                    Create Account
+                  </button>
+                </p>
               )}
-            </button>
-          </form>
-        )}
 
-        {/* ---------------- FORGOT PASSWORD FORM ---------------- */}
-        {mode === 'forgot' && (
-          <form onSubmit={handleForgotPassword} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Registered Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                <input
-                  type="email"
-                  required
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors"
-                />
-              </div>
+              {mode === 'forgot' && (
+                <button
+                  type="button"
+                  onClick={() => { setMode('signin'); setErrorMsg(''); }}
+                  className="text-brand-400 hover:text-brand-300 font-semibold"
+                >
+                  Back to Sign In
+                </button>
+              )}
             </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs rounded-lg transition-all shadow-lg shadow-brand-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {isSubmitting ? <span>Processing...</span> : <span>Send Reset Instructions</span>}
-            </button>
-          </form>
-        )}
-
-        {/* Footer switch */}
-        <div className="pt-4 border-t border-slate-800/80 text-center text-xs text-slate-400">
-          {mode === 'signup' && (
-            <p>
-              Already have an account?{' '}
-              <button
-                type="button"
-                onClick={() => { setMode('signin'); setErrorMsg(''); setSuccessNotice(''); }}
-                className="text-brand-400 hover:text-brand-300 font-semibold"
-              >
-                Sign In
-              </button>
-            </p>
-          )}
-
-          {mode === 'signin' && (
-            <p>
-              Don't have an account?{' '}
-              <button
-                type="button"
-                onClick={() => { setMode('signup'); setErrorMsg(''); setSuccessNotice(''); }}
-                className="text-brand-400 hover:text-brand-300 font-semibold"
-              >
-                Create Account
-              </button>
-            </p>
-          )}
-
-          {mode === 'forgot' && (
-            <button
-              type="button"
-              onClick={() => { setMode('signin'); setErrorMsg(''); }}
-              className="text-brand-400 hover:text-brand-300 font-semibold"
-            >
-              Back to Sign In
-            </button>
-          )}
-        </div>
-
-          </>
+          </div>
         )}
 
       </div>
     </div>
   );
 };
+
