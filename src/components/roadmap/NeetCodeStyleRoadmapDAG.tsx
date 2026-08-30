@@ -389,22 +389,22 @@ export const NeetCodeStyleRoadmapDAG: React.FC<NeetCodeStyleRoadmapDAGProps> = (
           </div>
 
           {/* Right: Search, Filter, Stats & Actions */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             
             {/* Search Input */}
             <div className="relative">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search topics, problems..."
+                placeholder="Search topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-3 py-1.5 bg-[#0e1626] border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 w-44 sm:w-56"
+                className="pl-8 pr-3 py-1.5 bg-[#0e1626] border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 w-36 sm:w-44 md:w-56"
               />
             </div>
 
-            {/* Difficulty Filter */}
-            <div className="flex items-center gap-1 bg-[#0e1626] border border-slate-800 p-1 rounded-xl">
+            {/* Difficulty Filter — desktop only */}
+            <div className="hidden sm:flex items-center gap-1 bg-[#0e1626] border border-slate-800 p-1 rounded-xl">
               {(['All', 'Easy', 'Medium', 'Hard'] as const).map(d => (
                 <button
                   key={d}
@@ -431,8 +431,8 @@ export const NeetCodeStyleRoadmapDAG: React.FC<NeetCodeStyleRoadmapDAGProps> = (
               </div>
             </div>
 
-            {/* Zoom Controls */}
-            <div className="flex items-center gap-1 bg-[#0e1626] border border-slate-800 p-1 rounded-xl">
+            {/* Zoom Controls — desktop only */}
+            <div className="hidden sm:flex items-center gap-1 bg-[#0e1626] border border-slate-800 p-1 rounded-xl">
               <button
                 onClick={() => setZoomLevel(prev => Math.max(0.75, prev - 0.1))}
                 className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
@@ -488,19 +488,25 @@ export const NeetCodeStyleRoadmapDAG: React.FC<NeetCodeStyleRoadmapDAGProps> = (
       </div>
 
       {/* ================= NEETCODE DAG CANVAS WITH CONNECTORS ================= */}
+      {/* Mobile scroll hint */}
+      <div className="md:hidden flex items-center gap-2 px-4 py-2 bg-zinc-900/80 border-b border-white/[0.06] text-[11px] text-slate-400">
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+        Scroll down to explore your full roadmap. Tap any card to open details.
+      </div>
+
       <div 
         ref={canvasRef}
-        className="w-full flex-1 flex flex-col items-center py-6 px-4 overflow-x-auto transition-transform duration-200"
-        style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
+        className="w-full flex-1 flex flex-col items-center py-6 px-2 sm:px-4 overflow-x-hidden transition-transform duration-200"
+        style={{ transform: `scale(${typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : zoomLevel})`, transformOrigin: 'top center' }}
       >
-        <div className="space-y-12 flex flex-col items-center max-w-6xl w-full">
+        <div className="space-y-8 sm:space-y-12 flex flex-col items-center max-w-6xl w-full">
           
           {tiers.map(([tierLevel, nodesInTier], tierIdx) => {
             return (
               <div key={tierLevel} className="flex flex-col items-center w-full relative">
                 
                 {/* Node Cards Row in this tier */}
-                <div className="flex flex-wrap justify-center items-stretch gap-6 sm:gap-8 z-10">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-stretch gap-3 sm:gap-6 z-10 w-full">
                   {nodesInTier.map(node => {
                     const stats = getNodeStats(node);
                     const isCompleted = stats.isCompleted;
@@ -515,12 +521,12 @@ export const NeetCodeStyleRoadmapDAG: React.FC<NeetCodeStyleRoadmapDAGProps> = (
                       <div
                         key={node.id}
                         onClick={() => handleOpenNodeModal(node)}
-                        className={`w-64 sm:w-72 p-4 rounded-2xl border transition-all duration-200 cursor-pointer select-none relative group text-left ${
+                        className={`w-full sm:w-64 md:w-72 p-4 rounded-2xl border transition-all duration-200 cursor-pointer select-none relative group text-left ${
                           isCompleted
-                            ? 'bg-[#0a121e] border-emerald-500/60 shadow-lg shadow-emerald-950/30 hover:border-emerald-400 hover:scale-[1.02]'
+                            ? 'bg-[#0a121e] border-emerald-500/60 shadow-lg shadow-emerald-950/30 active:scale-[0.98]'
                             : isCurrent
-                            ? 'bg-[#0f172a] border-brand-500/70 shadow-xl shadow-brand-500/20 hover:border-brand-400 hover:scale-[1.02]'
-                            : 'bg-[#090e18] border-slate-800/90 hover:border-slate-600 hover:bg-[#0d1424] hover:scale-[1.01]'
+                            ? 'bg-[#0f172a] border-brand-500/70 shadow-xl shadow-brand-500/20 active:scale-[0.98]'
+                            : 'bg-[#090e18] border-slate-800/90 hover:border-slate-600 hover:bg-[#0d1424] active:scale-[0.98]'
                         }`}
                       >
                         {/* Card Header: Category & Checkmark Badge */}
@@ -594,8 +600,8 @@ export const NeetCodeStyleRoadmapDAG: React.FC<NeetCodeStyleRoadmapDAGProps> = (
 
       {/* ================= NEETCODE PROBLEM DRAWER / MODAL ================= */}
       {selectedNode && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="bg-[#090e1a] border border-slate-800 rounded-3xl max-w-4xl w-full p-5 sm:p-8 space-y-6 shadow-2xl relative my-6 text-left animate-scale-in max-h-[92vh] flex flex-col">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-hidden">
+          <div className="bg-[#090e1a] border border-slate-800 rounded-t-3xl sm:rounded-3xl max-w-4xl w-full p-5 sm:p-8 space-y-6 shadow-2xl relative text-left animate-scale-in max-h-[90vh] sm:max-h-[92vh] flex flex-col overflow-y-auto">
             
             {/* Modal Top Close */}
             <button

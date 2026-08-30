@@ -8,6 +8,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import type { EducationLevel, UserProfile } from '../../engine/types';
+import { jsPDF } from 'jspdf';
 import { generatePersonalizedRoadmap } from '../../engine/adaptiveEngine';
 
 interface ProfileViewProps {
@@ -54,6 +55,18 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     onUpdateProfile(updated);
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
+  };
+
+  // Export profile as PDF using jsPDF
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('NEXORA Profile Export', 10, 20);
+    const profileData = JSON.stringify(profile, null, 2);
+    const lines = doc.splitTextToSize(profileData, 180);
+    doc.setFontSize(10);
+    doc.text(lines, 10, 30);
+    doc.save('NEXORA_Profile.pdf');
   };
 
   return (
@@ -197,13 +210,23 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             <span>Reset & Re-run Onboarding Diagnostic</span>
           </button>
 
-          <button
-            type="submit"
-            className="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-bold text-white shadow-lg shadow-brand-500/20 transition-all flex items-center gap-2"
-          >
-            {savedSuccess ? <Check className="w-4 h-4 text-emerald-300" /> : <Save className="w-4 h-4" />}
-            <span>{savedSuccess ? 'Settings Saved & Roadmap Synced!' : 'Save & Sync Journey'}</span>
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              className="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-xs font-bold text-white shadow-lg shadow-brand-500/20 transition-all flex items-center gap-2"
+            >
+              {savedSuccess ? <Check className="w-4 h-4 text-emerald-300" /> : <Save className="w-4 h-4" />}
+              <span>{savedSuccess ? 'Settings Saved & Roadmap Synced!' : 'Save & Sync Journey'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleExportPDF}
+              className="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-medium text-white flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              <span>Export PDF</span>
+            </button>
+          </div>
         </div>
 
       </form>

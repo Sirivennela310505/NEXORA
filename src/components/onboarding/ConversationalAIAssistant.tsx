@@ -209,21 +209,64 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
       setStage(3);
       setIsAiTyping(false);
 
+      // Goal-aware struggle options
+      const getStruggleOptions = () => {
+        const cat = capturedCategory;
+        if (cat === 'jee' || cat === 'neet') {
+          return [
+            { label: 'Calculus & Integration', value: 'Calculus derivations and integration problems', icon: '📐' },
+            { label: 'Organic Chemistry Mechanisms', value: 'Organic chemistry reaction mechanisms and named reactions', icon: '🧪' },
+            { label: 'Physics Numericals & Formulas', value: 'Physics numerical problems and formula application', icon: '⚡' },
+            { label: 'Time Management in Exam Hall', value: 'Managing time during 3-hour exam sessions', icon: '⏳' },
+            { label: 'Inorganic Chemistry & P-Block', value: 'Inorganic chemistry p-block and coordination compounds', icon: '🔬' }
+          ];
+        }
+        if (cat === 'ai_ml') {
+          return [
+            { label: 'Linear Algebra & Matrix Math', value: 'Linear algebra, eigenvalues and matrix operations for ML', icon: '🔢' },
+            { label: 'Understanding Neural Networks', value: 'Backpropagation and neural network architecture', icon: '🧠' },
+            { label: 'Implementing Models from Scratch', value: 'Coding ML models without libraries', icon: '💻' },
+            { label: 'Statistics & Probability', value: 'Bayesian stats and probability for ML', icon: '📊' },
+            { label: 'Productionizing & Deploying AI', value: 'Moving from notebooks to production ML pipelines', icon: '🚀' }
+          ];
+        }
+        if (cat === 'internship' || cat === 'swe') {
+          return [
+            { label: 'Solving Hard DSA Problems', value: 'Struggling to solve medium/hard LeetCode problems independently', icon: '🧩' },
+            { label: 'Trees, Graphs & DP', value: 'Dynamic programming and graph traversal algorithms', icon: '🌳' },
+            { label: 'System Design Concepts', value: 'System design, scalability and distributed systems basics', icon: '🏗️' },
+            { label: 'Time Management & Consistency', value: 'Daily consistency and pacing for placements', icon: '⏳' },
+            { label: 'Resume & Project Building', value: 'Building resume-worthy projects and open source contributions', icon: '📁' }
+          ];
+        }
+        if (cat === 'career_switch') {
+          return [
+            { label: 'Starting Programming from Zero', value: 'Learning programming fundamentals from scratch', icon: '🌱' },
+            { label: 'Building a Portfolio', value: 'Creating projects to showcase to employers', icon: '📁' },
+            { label: 'Understanding CS Fundamentals', value: 'Data structures, algorithms and CS theory basics', icon: '💻' },
+            { label: 'Imposter Syndrome & Confidence', value: 'Self-doubt and feeling behind peers from CS background', icon: '🧠' },
+            { label: 'Finding the Right Learning Path', value: 'Too many resources, unclear where to start', icon: '🗺️' }
+          ];
+        }
+        // Default / full-stack / data engineering / other
+        return [
+          { label: 'Database & SQL Optimization', value: 'Complex SQL queries, indexing and query optimization', icon: '🗄️' },
+          { label: 'Building Scalable Pipelines', value: 'Designing ETL pipelines and data workflows', icon: '🔄' },
+          { label: 'Frontend & API Integration', value: 'Connecting backend APIs with frontend frameworks', icon: '🌐' },
+          { label: 'Time Management & Consistency', value: 'Daily consistency and structured learning', icon: '⏳' },
+          { label: 'Deploying & DevOps', value: 'Docker, CI/CD pipelines and cloud deployment', icon: '🚀' }
+        ];
+      };
+
       setMessages(prev => [
         ...prev,
         {
           id: `ai-struggles`,
           sender: 'ai',
           text: `Thanks for sharing your baseline.\n\n` +
-            `**What do you struggle with the most, or where do you get stuck?**\n` +
-            `(NEXORA will create targeted visual prerequisite paths around these bottlenecks!)`,
-          options: [
-            { label: 'Solving Hard Problems on My Own', value: 'Struggling to solve medium/hard problems independently', icon: '🧩' },
-            { label: 'Hashing & Deep Data Structures', value: 'DSA Hashing and Trees logic', icon: '🌳' },
-            { label: 'Calculus & Physics Problem Solving', value: 'Calculus derivations and Physics numericals', icon: '⚛️' },
-            { label: 'Time Management & Study Consistency', value: 'Daily consistency and pacing', icon: '⏳' },
-            { label: 'Building Real Projects / Resume Impact', value: 'Translating knowledge into resume-worthy projects', icon: '📁' }
-          ],
+            `**What do you find most challenging or where do you get stuck the most?**\n` +
+            `(NEXORA will build targeted prerequisite paths around exactly these bottlenecks!)`,
+          options: getStruggleOptions(),
           field: 'struggles'
         }
       ]);
