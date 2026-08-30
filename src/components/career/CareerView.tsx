@@ -3,10 +3,14 @@ import {
   Briefcase, 
   FileText, 
   Sparkles,
-  CheckCircle2,
-  ExternalLink, 
+  CheckCircle2, 
   Copy, 
-  Check
+  Check,
+  Building2,
+  MapPin,
+  Calendar,
+  Layers,
+  ArrowUpRight
 } from 'lucide-react';
 import type { ResumeData, UserProfile } from '../../engine/types';
 import { calculateOpportunityMatches, evaluateResumeATS, getInitialResume } from '../../engine/careerEngine';
@@ -38,30 +42,33 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
   };
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto pb-16">
+    <div className="space-y-8 max-w-6xl mx-auto pb-16 text-slate-100 selection:bg-brand-500 selection:text-white">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-slate-900/70 border border-white/[0.08] backdrop-blur-md">
-        <div className="space-y-1">
+      {/* Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-6 sm:p-8 rounded-3xl bg-zinc-950 border border-white/[0.08] backdrop-blur-md shadow-2xl">
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold tracking-wider text-brand-400 uppercase">Career Readiness & Placement Suite</span>
+            <span className="text-[10px] font-bold tracking-widest text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20 uppercase flex items-center gap-1.5">
+              <Sparkles className="w-3 h-3 text-cyan-400" />
+              Career Readiness & Placement Suite
+            </span>
           </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Opportunities & ATS Resume Optimizer
           </h1>
-          <p className="text-xs text-slate-400">
-            Real internship alignments, match explanations, and ATS resume scoring calibrated to your roadmap.
+          <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
+            Real-world internship alignments, matching explanations, and ATS resume scoring calibrated to your <strong>{profile.goalTitle}</strong> roadmap.
           </p>
         </div>
 
-        {/* Tab switcher */}
-        <div className="flex items-center gap-1 bg-slate-950 p-1.5 rounded-xl border border-slate-800 shrink-0">
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-1.5 bg-zinc-900/90 p-1.5 rounded-2xl border border-zinc-800 shrink-0 self-start sm:self-center">
           <button
             onClick={() => setActiveTab('opportunities')}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === 'opportunities'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 font-extrabold'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             <Briefcase className="w-3.5 h-3.5" />
@@ -69,10 +76,10 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
           </button>
           <button
             onClick={() => setActiveTab('resume')}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === 'resume'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 font-extrabold'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -83,44 +90,69 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
 
       {/* 1. OPPORTUNITIES TAB */}
       {activeTab === 'opportunities' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4 animate-fade-in">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {opportunities.map((opp) => (
               <div
                 key={opp.id}
-                className="p-6 rounded-2xl bg-slate-900/60 border border-white/[0.08] hover:border-slate-700 transition-all space-y-4 flex flex-col justify-between"
+                className="p-6 rounded-3xl bg-zinc-950 border border-white/[0.08] hover:border-cyan-500/40 transition-all hover:scale-[1.01] shadow-xl space-y-4 flex flex-col justify-between group text-left"
               >
-                <div className="space-y-3">
+                <div className="space-y-3.5">
+                  {/* Top Row: Type & Match Badge */}
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold uppercase">
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-cyan-400 font-bold uppercase tracking-wider">
                         {opp.type}
                       </span>
-                      <h3 className="text-base font-bold text-white mt-1">{opp.title}</h3>
-                      <p className="text-xs text-brand-400 font-semibold">{opp.organization} • {opp.location}</p>
+                      <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors leading-snug">
+                        {opp.title}
+                      </h3>
+                      <div className="flex items-center gap-2 text-xs text-slate-400 flex-wrap">
+                        <span className="flex items-center gap-1 font-medium text-slate-300">
+                          <Building2 className="w-3.5 h-3.5 text-slate-500" />
+                          {opp.organization}
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                          {opp.location}
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="text-right shrink-0">
-                      <div className="text-lg font-black text-emerald-400">{opp.matchScore}%</div>
-                      <div className="text-[10px] text-slate-400">Match Score</div>
+                    <div className="text-right shrink-0 px-3 py-1.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                      <div className="text-base font-black text-emerald-400">{opp.matchScore}%</div>
+                      <div className="text-[9px] font-semibold text-emerald-300/80 uppercase tracking-wider">Match</div>
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-300 bg-slate-950/70 p-3 rounded-xl border border-slate-800">
-                    <strong className="text-brand-300 font-semibold block mb-0.5">Why this matches your profile:</strong>
-                    {opp.matchReason}
-                  </p>
+                  {/* Why this matches callout */}
+                  <div className="p-3.5 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 space-y-1">
+                    <strong className="text-xs text-cyan-400 font-semibold flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-cyan-400" />
+                      Why this matches your profile:
+                    </strong>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {opp.matchReason}
+                    </p>
+                  </div>
 
-                  <div className="space-y-1.5 text-xs">
-                    <span className="text-slate-400 text-[11px]">Required roadmap competencies:</span>
+                  {/* Required Roadmap Competencies */}
+                  <div className="space-y-1.5">
+                    <span className="text-slate-400 text-[11px] font-medium flex items-center gap-1">
+                      <Layers className="w-3 h-3 text-slate-500" />
+                      Required roadmap competencies:
+                    </span>
                     <div className="flex flex-wrap gap-1.5">
                       {opp.requiredSkills.map(req => {
                         const isMastered = profile.skills.some(s => s.skillName === req && (s.status === 'mastered' || (s.currentMastery && s.currentMastery >= 70)));
                         return (
                           <span
                             key={req}
-                            className={`text-[10px] px-2 py-0.5 rounded-md font-medium ${
-                              isMastered ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'
+                            className={`text-[10px] px-2.5 py-1 rounded-lg font-medium transition-colors ${
+                              isMastered 
+                                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' 
+                                : 'bg-zinc-900 text-slate-400 border border-zinc-800'
                             }`}
                           >
                             {req} {isMastered && '✓'}
@@ -131,16 +163,21 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Deadline: {opp.deadline}</span>
+                {/* Card Footer */}
+                <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between gap-2 text-xs">
+                  <span className="text-slate-500 flex items-center gap-1 text-[11px]">
+                    <Calendar className="w-3 h-3 text-slate-500" />
+                    Deadline: <strong className="text-slate-300 font-normal">{opp.deadline}</strong>
+                  </span>
+                  
                   <a
                     href={opp.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3.5 py-1.5 rounded-lg bg-brand-600/20 hover:bg-brand-600/40 border border-brand-500/30 text-brand-300 font-semibold flex items-center gap-1.5 transition-colors"
+                    className="px-4 py-2 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-white/10"
                   >
                     <span>Apply / View Listing</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ArrowUpRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
@@ -151,19 +188,19 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
 
       {/* 2. ATS RESUME BUILDER TAB */}
       {activeTab === 'resume' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
           
           {/* Left 2 Cols: Form & Preview */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/[0.08] space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-950 border border-white/[0.08] space-y-5 shadow-2xl">
+              <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-brand-400" />
-                  <span>Resume Content & Alignment</span>
+                  <FileText className="w-4 h-4 text-cyan-400" />
+                  <span>Resume Content & Target Alignment</span>
                 </h3>
                 <button
                   onClick={handleCopyResumeText}
-                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-semibold text-white transition-colors flex items-center gap-1.5 shadow-sm"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied to Clipboard!' : 'Copy Plaintext'}</span>
@@ -179,22 +216,24 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
                   value={resume.summary}
                   onChange={(e) => handleUpdateSummary(e.target.value)}
                   rows={3}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-brand-500 leading-relaxed"
+                  className="w-full px-4 py-3 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-400 leading-relaxed transition-colors"
                 />
               </div>
 
               {/* Projects Snippet */}
               <div className="space-y-3 pt-2">
-                <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Featured Technical Projects ({resume.projects.length})
                 </h4>
                 {resume.projects.map((proj, idx) => (
-                  <div key={idx} className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2 text-xs">
+                  <div key={idx} className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-2 text-xs">
                     <div className="flex items-center justify-between">
                       <strong className="text-white text-sm">{proj.title}</strong>
-                      <span className="text-[10px] text-brand-400 font-mono">{proj.technologies}</span>
+                      <span className="text-[10px] text-cyan-400 font-mono bg-cyan-500/10 px-2 py-0.5 rounded-md border border-cyan-500/20">
+                        {proj.technologies}
+                      </span>
                     </div>
-                    <ul className="list-disc list-inside space-y-1 text-slate-300">
+                    <ul className="list-disc list-inside space-y-1 text-slate-300 leading-relaxed">
                       {proj.bullets.map((b, bIdx) => (
                         <li key={bIdx}>{b}</li>
                       ))}
@@ -204,13 +243,13 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
               </div>
 
               {/* Mastered Skills List */}
-              <div className="space-y-2 pt-2">
-                <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              <div className="space-y-2.5 pt-2">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Verified Skills from Roadmap ({resume.skillsList.length})
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {resume.skillsList.map((skill, sIdx) => (
-                    <span key={sIdx} className="px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 text-xs font-medium">
+                    <span key={sIdx} className="px-3 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-slate-200 text-xs font-medium">
                       {skill}
                     </span>
                   ))}
@@ -221,9 +260,9 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
 
           {/* Right Col: ATS Score & Actionable Feedback */}
           <div className="space-y-6">
-            <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/[0.08] space-y-6">
+            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-950 border border-white/[0.08] space-y-6 shadow-2xl">
               <div className="text-center space-y-2">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-brand-500/10 border-2 border-brand-500/40 text-2xl font-black text-white shadow-lg shadow-brand-500/10">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-cyan-500/10 border-2 border-cyan-400 text-2xl font-black text-white shadow-xl shadow-cyan-500/10">
                   {atsReport.atsScore}
                 </div>
                 <h3 className="text-sm font-bold text-white">ATS Impact & Match Score</h3>
@@ -232,21 +271,21 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
                 </p>
               </div>
 
-              <div className="space-y-3 pt-2 border-t border-slate-800">
+              <div className="space-y-3 pt-2 border-t border-zinc-800">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-brand-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                   <span>AI ATS Optimization Feedback</span>
                 </h4>
 
                 {atsReport.feedback.length === 0 ? (
-                  <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2">
+                  <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Your resume matches top-tier technical screening standards!</span>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {atsReport.feedback.map((fb, fbIdx) => (
-                      <div key={fbIdx} className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-1">
+                      <div key={fbIdx} className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs text-slate-300 space-y-1">
                         <span className="text-amber-400 font-semibold block">• Recommendation</span>
                         <p className="text-slate-400">{fb}</p>
                       </div>
@@ -255,7 +294,7 @@ export const CareerView: React.FC<CareerViewProps> = ({ profile }) => {
                 )}
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-400 space-y-1">
+              <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs text-slate-400 space-y-1">
                 <span className="font-semibold text-slate-200 block">Target Role Alignment:</span>
                 <span>{profile.goalTitle} (Standard Product Company Bar)</span>
               </div>
