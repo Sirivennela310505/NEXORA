@@ -2,7 +2,7 @@ import os
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.enum.text import PP_ALIGN
 from pptx.enum.shapes import MSO_SHAPE
 
 def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentation.pptx"):
@@ -11,21 +11,19 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
     prs.slide_height = Inches(7.5)
 
     # Executive Light / White Theme Palette
-    COLOR_BG = RGBColor(248, 250, 252)       # #f8fafc (Clean Slate Light Background)
-    COLOR_CARD = RGBColor(255, 255, 255)     # #ffffff (Pure White Card)
-    COLOR_CARD_BORDER = RGBColor(226, 232, 240) # #e2e8f0 (Soft Border)
-    COLOR_CARD_HOVER = RGBColor(241, 245, 249)  # #f1f5f9
+    COLOR_BG = RGBColor(248, 250, 252)          # #f8fafc (Clean Slate Light Background)
+    COLOR_CARD = RGBColor(255, 255, 255)        # #ffffff (Pure White Card)
+    COLOR_CARD_BORDER = RGBColor(226, 232, 240)    # #e2e8f0 (Soft Border)
     
     # Modern Professional Accent Colors
-    COLOR_PRIMARY = RGBColor(15, 23, 42)     # #0f172a (Deep Slate / Dark Navy for Headers)
-    COLOR_BODY = RGBColor(51, 65, 85)        # #334155 (Slate 700 for Body text)
-    COLOR_MUTED = RGBColor(100, 116, 139)    # #64748b (Slate 500 for Subtitles)
+    COLOR_PRIMARY = RGBColor(15, 23, 42)        # #0f172a (Deep Slate / Dark Navy)
+    COLOR_BODY = RGBColor(51, 65, 85)           # #334155 (Slate 700)
+    COLOR_MUTED = RGBColor(100, 116, 139)       # #64748b (Slate 500)
     
-    COLOR_BRAND = RGBColor(79, 70, 229)      # #4f46e5 (Indigo 600 - Primary Brand)
-    COLOR_CYAN = RGBColor(2, 132, 199)       # #0284c7 (Sky/Blue Accent)
-    COLOR_EMERALD = RGBColor(13, 148, 136)   # #0d9488 (Teal/Emerald Accent)
-    COLOR_AMBER = RGBColor(217, 119, 6)      # #d97706 (Amber Warning)
-    COLOR_TAG_BG = RGBColor(238, 242, 255)   # Light Indigo Pill Background
+    COLOR_BRAND = RGBColor(79, 70, 229)         # #4f46e5 (Indigo 600)
+    COLOR_CYAN = RGBColor(2, 132, 199)          # #0284c7 (Sky/Blue)
+    COLOR_EMERALD = RGBColor(13, 148, 136)      # #0d9488 (Teal/Emerald)
+    COLOR_AMBER = RGBColor(217, 119, 6)         # #d97706 (Amber)
 
     def add_blank_slide():
         blank_slide_layout = prs.slide_layouts[6]
@@ -37,48 +35,42 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         return slide
 
     def add_header(slide, tag_text, title_text, subtitle_text=None):
-        # Header text box
-        tx_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.5), Inches(11.5), Inches(1.3))
+        tx_box = slide.shapes.add_textbox(Inches(0.9), Inches(0.45), Inches(11.5), Inches(1.2))
         tf = tx_box.text_frame
         tf.word_wrap = True
         tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
 
-        # Pill Tag
         p_tag = tf.paragraphs[0]
         p_tag.text = tag_text.upper()
         p_tag.font.size = Pt(10)
         p_tag.font.bold = True
         p_tag.font.color.rgb = COLOR_BRAND
-        p_tag.space_after = Pt(4)
+        p_tag.space_after = Pt(3)
 
-        # Title
         p_title = tf.add_paragraph()
         p_title.text = title_text
         p_title.font.size = Pt(22)
         p_title.font.bold = True
         p_title.font.color.rgb = COLOR_PRIMARY
         
-        # Subtitle
         if subtitle_text:
             p_sub = tf.add_paragraph()
             p_sub.text = subtitle_text
             p_sub.font.size = Pt(11.5)
             p_sub.font.color.rgb = COLOR_MUTED
-            p_sub.space_before = Pt(3)
+            p_sub.space_before = Pt(2)
 
     # ----------------------------------------------------
-    # SLIDE 1: Title Slide (Clean Executive White)
+    # SLIDE 1: Title Slide
     # ----------------------------------------------------
     s1 = add_blank_slide()
 
-    # Decorative top bar
     top_bar = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, Inches(13.333), Inches(0.1))
     top_bar.fill.solid()
     top_bar.fill.fore_color.rgb = COLOR_BRAND
     top_bar.line.color.rgb = COLOR_BRAND
 
-    # Main Hero Container
-    hero_card = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.0), Inches(1.1), Inches(11.333), Inches(5.4))
+    hero_card = s1.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.0), Inches(1.0), Inches(11.333), Inches(5.6))
     hero_card.fill.solid()
     hero_card.fill.fore_color.rgb = COLOR_CARD
     hero_card.line.color.rgb = COLOR_CARD_BORDER
@@ -116,7 +108,6 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
     p_desc.font.color.rgb = COLOR_BODY
     p_desc.space_after = Pt(22)
 
-    # Info Divider
     p_pres = tf1.add_paragraph()
     p_pres.text = "Presenter Information: Team Talent Innovators  |  Category: AI in Education & Career Placement"
     p_pres.font.size = Pt(12)
@@ -130,12 +121,91 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
     p_meta.font.color.rgb = COLOR_EMERALD
 
     # ----------------------------------------------------
-    # SLIDE 2: Problem Understanding
+    # SLIDE 2: Presenter Details
     # ----------------------------------------------------
     s2 = add_blank_slide()
-    add_header(s2, "Problem Understanding", "The Gap in Modern Technical Learning & Career Readiness", "Understanding the structural pain points that cause 90% of learners to drop out")
+    add_header(s2, "Presenter Details", "Project Presentation Team", "The innovators behind NEXORA's design and execution")
 
-    cards_s2 = [
+    card_team = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.9), Inches(1.9), Inches(5.6), Inches(4.9))
+    card_team.fill.solid()
+    card_team.fill.fore_color.rgb = COLOR_CARD
+    card_team.line.color.rgb = COLOR_CARD_BORDER
+
+    tf_team = card_team.text_frame
+    tf_team.word_wrap = True
+    tf_team.margin_left = Inches(0.4)
+    tf_team.margin_right = Inches(0.4)
+    tf_team.margin_top = Inches(0.4)
+
+    p = tf_team.paragraphs[0]
+    p.text = "TEAM DETAILS"
+    p.font.size = Pt(11)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_BRAND
+    p.space_after = Pt(8)
+
+    p = tf_team.add_paragraph()
+    p.text = "Team Name:"
+    p.font.size = Pt(13)
+    p.font.color.rgb = COLOR_MUTED
+    
+    p = tf_team.add_paragraph()
+    p.text = "Talent Innovators"
+    p.font.size = Pt(24)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_PRIMARY
+    p.space_after = Pt(20)
+
+    p = tf_team.add_paragraph()
+    p.text = "Project Track / Theme:"
+    p.font.size = Pt(13)
+    p.font.color.rgb = COLOR_MUTED
+
+    p = tf_team.add_paragraph()
+    p.text = "AI in Education, Adaptive Learning & Career Placement"
+    p.font.size = Pt(15)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_CYAN
+
+    card_members = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(6.8), Inches(1.9), Inches(5.65), Inches(4.9))
+    card_members.fill.solid()
+    card_members.fill.fore_color.rgb = COLOR_CARD
+    card_members.line.color.rgb = COLOR_CARD_BORDER
+
+    tf_mem = card_members.text_frame
+    tf_mem.word_wrap = True
+    tf_mem.margin_left = Inches(0.4)
+    tf_mem.margin_right = Inches(0.4)
+    tf_mem.margin_top = Inches(0.4)
+
+    p = tf_mem.paragraphs[0]
+    p.text = "TEAM MEMBERS"
+    p.font.size = Pt(11)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_EMERALD
+    p.space_after = Pt(14)
+
+    members_placeholder = [
+        "1.  ___________________________________  (Team Lead)",
+        "2.  ___________________________________  (Developer / AI)",
+        "3.  ___________________________________  (Developer / UI)",
+        "4.  ___________________________________  (Research / QA)"
+    ]
+
+    for m in members_placeholder:
+        p = tf_mem.add_paragraph()
+        p.text = m
+        p.font.size = Pt(13)
+        p.font.color.rgb = COLOR_PRIMARY
+        p.space_after = Pt(16)
+
+    # ----------------------------------------------------
+    # SLIDE 3: Problem Understanding
+    # ----------------------------------------------------
+    s3 = add_blank_slide()
+    add_header(s3, "Problem Understanding", "The Gap in Modern Technical Learning & Career Readiness", "Understanding the structural pain points that cause 90% of learners to drop out")
+
+    cards_s3 = [
         ("The Gap in E-Learning", 
          "Online learners face severe information overload with thousands of disconnected video tutorials. Finding the exact right courses and sequencing them into an actionable study path is frustrating, time-consuming, and prone to abandonment.",
          COLOR_BRAND),
@@ -147,11 +217,11 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
          COLOR_EMERALD)
     ]
 
-    for i, (title, desc, col) in enumerate(cards_s2):
+    for i, (title, desc, col) in enumerate(cards_s3):
         left = Inches(0.9 + i * 3.9)
-        top = Inches(1.9)
+        top = Inches(1.8)
         
-        box = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(3.7), Inches(5.0))
+        box = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(3.7), Inches(5.1))
         box.fill.solid()
         box.fill.fore_color.rgb = COLOR_CARD
         box.line.color.rgb = COLOR_CARD_BORDER
@@ -176,10 +246,10 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         p2.line_spacing = 1.25
 
     # ----------------------------------------------------
-    # SLIDE 3: Solution Approach
+    # SLIDE 4: Solution Approach
     # ----------------------------------------------------
-    s3 = add_blank_slide()
-    add_header(s3, "Solution Approach", "How NEXORA Solves Curriculum Sequencing", "An end-to-end adaptive framework guiding learners from goal intake to recruiter readiness")
+    s4 = add_blank_slide()
+    add_header(s4, "Solution Approach", "How NEXORA Solves Curriculum Sequencing", "An end-to-end adaptive framework guiding learners from goal intake to recruiter readiness")
 
     solutions = [
         ("1. Smart Goal Matching", 
@@ -200,9 +270,9 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         col_idx = i % 2
         row_idx = i // 2
         left = Inches(0.9 + col_idx * 5.85)
-        top = Inches(1.9 + row_idx * 2.5)
+        top = Inches(1.8 + row_idx * 2.55)
         
-        box = s3.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(5.65), Inches(2.3))
+        box = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(5.65), Inches(2.35))
         box.fill.solid()
         box.fill.fore_color.rgb = COLOR_CARD
         box.line.color.rgb = COLOR_CARD_BORDER
@@ -227,10 +297,26 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         p2.line_spacing = 1.2
 
     # ----------------------------------------------------
-    # SLIDE 4: System Architecture
+    # SLIDE 5: Visual Architecture Diagram (Dedicated Architecture Slide)
     # ----------------------------------------------------
-    s4 = add_blank_slide()
-    add_header(s4, "System Architecture", "High-Performance Modular Tech Stack", "Modern client-side architecture backed by generative AI and persistent storage")
+    s5 = add_blank_slide()
+    add_header(s5, "System Architecture Diagram", "Visual End-to-End System Architecture", "Dataflow across UI presentation, adaptive engines, Gemini LLM reasoning, and cloud persistence")
+
+    diag_path = "public/nexora_architecture_diagram.png"
+    if os.path.exists(diag_path):
+        s5.shapes.add_picture(diag_path, Inches(0.9), Inches(1.7), Inches(11.533), Inches(5.3))
+    else:
+        # Fallback if image not found
+        arch_box = s5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.9), Inches(1.7), Inches(11.533), Inches(5.3))
+        arch_box.fill.solid()
+        arch_box.fill.fore_color.rgb = COLOR_CARD
+        arch_box.line.color.rgb = COLOR_CARD_BORDER
+
+    # ----------------------------------------------------
+    # SLIDE 6: System Architecture Layer Breakdown
+    # ----------------------------------------------------
+    s6 = add_blank_slide()
+    add_header(s6, "Technical Execution", "Architectural Stack & System Components", "Detailed technical specifications of the 4 core layers")
 
     arch_layers = [
         ("Frontend Application Layer", 
@@ -251,9 +337,9 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         col_idx = i % 2
         row_idx = i // 2
         left = Inches(0.9 + col_idx * 5.85)
-        top = Inches(1.9 + row_idx * 2.5)
+        top = Inches(1.8 + row_idx * 2.55)
         
-        box = s4.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(5.65), Inches(2.3))
+        box = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(5.65), Inches(2.35))
         box.fill.solid()
         box.fill.fore_color.rgb = COLOR_CARD
         box.line.color.rgb = COLOR_CARD_BORDER
@@ -278,17 +364,17 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         p2.line_spacing = 1.18
 
     # ----------------------------------------------------
-    # SLIDE 5: AI & ML Techniques Used
+    # SLIDE 7: AI & ML Techniques Used
     # ----------------------------------------------------
-    s5 = add_blank_slide()
-    add_header(s5, "AI & ML Techniques", "Core Machine Learning & LLM Implementations", "How generative intelligence and topological graphs deliver customized learning")
+    s7 = add_blank_slide()
+    add_header(s7, "AI & ML Techniques", "Core Machine Learning & LLM Implementations", "How generative intelligence and topological graphs deliver customized learning")
 
     ai_techniques = [
         ("1. Large Language Model Integration", 
          "Integrated Google Gemini 1.5 Flash and 2.0 API with dynamic context injection. Sends full user state (Target Goal, Completed Milestones, Active Skill Gaps, Pacing) to generate tailored conversational guidance, code examples, and doubt resolution.",
          COLOR_BRAND),
         ("2. Topological Graph Traversal (DAG)", 
-         "Implements graph-theoretic dependency trees where skills represent nodes and prerequisites represent directed edges. Automatically triggers remedial sub-branches when assessment scores drop below mastery benchmarks (70%).",
+         "Implements graph-theoretic dependency trees where skills represent nodes and prerequisites represent directed edges. Automatically triggers remedial sub-branches when assessment scores drop below threshold benchmarks (70%).",
          COLOR_CYAN),
         ("3. Structured Output & JSON Enforcement", 
          "Utilizes strict JSON schema prompting to dynamically generate 8-step roadmap milestones, goal-specific challenge vectors, and diagnostic multiple-choice assessments on the fly.",
@@ -302,9 +388,9 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         col_idx = i % 2
         row_idx = i // 2
         left = Inches(0.9 + col_idx * 5.85)
-        top = Inches(1.9 + row_idx * 2.5)
+        top = Inches(1.8 + row_idx * 2.55)
         
-        box = s5.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(5.65), Inches(2.3))
+        box = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(5.65), Inches(2.35))
         box.fill.solid()
         box.fill.fore_color.rgb = COLOR_CARD
         box.line.color.rgb = COLOR_CARD_BORDER
@@ -329,12 +415,12 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         p2.line_spacing = 1.2
 
     # ----------------------------------------------------
-    # SLIDE 6: Key Features & Core Workflows
+    # SLIDE 8: Key Features & Core Workflows
     # ----------------------------------------------------
-    s6 = add_blank_slide()
-    add_header(s6, "Product Features", "Key Features & Core User Workflows", "Comprehensive suite of integrated tools designed for continuous student mastery")
+    s8 = add_blank_slide()
+    add_header(s8, "Product Features", "Key Features & Core User Workflows", "Comprehensive suite of integrated tools designed for continuous student mastery")
 
-    features_s6 = [
+    features_s8 = [
         ("AI Conversational Onboarding", "Interactive voice & text interface gathering user goals, time availability, and background.", COLOR_BRAND),
         ("Interactive Flowchart DAG", "Visual dependency roadmap with clickable nodes, learning objectives, and status tags.", COLOR_CYAN),
         ("Automated Diagnostic Engine", "Benchmark-driven MCQ quizzes that calculate real-time mastery percentages per skill.", COLOR_EMERALD),
@@ -345,13 +431,13 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         ("100% Free Resources Catalog", "Curated zero-cost materials from MIT OpenCourseWare, CS50, Disha, HCV, & freeCodeCamp.", COLOR_PRIMARY)
     ]
 
-    for i, (title, desc, col) in enumerate(features_s6):
+    for i, (title, desc, col) in enumerate(features_s8):
         col_idx = i % 4
         row_idx = i // 4
         left = Inches(0.9 + col_idx * 2.9)
-        top = Inches(1.9 + row_idx * 2.5)
+        top = Inches(1.8 + row_idx * 2.55)
         
-        box = s6.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(2.75), Inches(2.3))
+        box = s8.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(2.75), Inches(2.35))
         box.fill.solid()
         box.fill.fore_color.rgb = COLOR_CARD
         box.line.color.rgb = COLOR_CARD_BORDER
@@ -376,49 +462,49 @@ def create_nexora_white_presentation(output_path="NEXORA_Clean_White_Presentatio
         p2.line_spacing = 1.15
 
     # ----------------------------------------------------
-    # SLIDE 7: Summary & Conclusion
+    # SLIDE 9: Summary & Conclusion
     # ----------------------------------------------------
-    s7 = add_blank_slide()
+    s9 = add_blank_slide()
 
-    card_s7 = s7.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.0), Inches(1.1), Inches(11.333), Inches(5.4))
-    card_s7.fill.solid()
-    card_s7.fill.fore_color.rgb = COLOR_CARD
-    card_s7.line.color.rgb = COLOR_CARD_BORDER
+    card_s9 = s9.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(1.0), Inches(1.0), Inches(11.333), Inches(5.6))
+    card_s9.fill.solid()
+    card_s9.fill.fore_color.rgb = COLOR_CARD
+    card_s9.line.color.rgb = COLOR_CARD_BORDER
 
-    tf7 = card_s7.text_frame
-    tf7.word_wrap = True
-    tf7.margin_left = Inches(0.6)
-    tf7.margin_right = Inches(0.6)
-    tf7.margin_top = Inches(0.5)
+    tf9 = card_s9.text_frame
+    tf9.word_wrap = True
+    tf9.margin_left = Inches(0.6)
+    tf9.margin_right = Inches(0.6)
+    tf9.margin_top = Inches(0.5)
 
-    p = tf7.paragraphs[0]
+    p = tf9.paragraphs[0]
     p.text = "THE FUTURE OF ADAPTIVE EDUCATION"
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = COLOR_BRAND
     p.space_after = Pt(8)
 
-    p1 = tf7.add_paragraph()
+    p1 = tf9.add_paragraph()
     p1.text = "Thank You! Experience NEXORA SaaS Live"
     p1.font.size = Pt(36)
     p1.font.bold = True
     p1.font.color.rgb = COLOR_PRIMARY
     p1.space_after = Pt(12)
 
-    p2 = tf7.add_paragraph()
+    p2 = tf9.add_paragraph()
     p2.text = "NEXORA bridges the gap between disorganized online educational content and structured, recruiter-ready student outcomes through intelligent sequencing, real-time diagnostics, and personalized AI mentorship."
     p2.font.size = Pt(13)
     p2.font.color.rgb = COLOR_BODY
     p2.space_after = Pt(24)
 
-    p3 = tf7.add_paragraph()
+    p3 = tf9.add_paragraph()
     p3.text = "• Team: Talent Innovators\n• Live Web Application: https://nexora-path-finder.vercel.app\n• GitHub Repository: https://github.com/Sirivennela310505/NEXORA"
     p3.font.size = Pt(12)
     p3.font.bold = True
     p3.font.color.rgb = COLOR_BRAND
 
     prs.save(output_path)
-    print(f"White presentation successfully saved to: {output_path}")
+    print(f"White presentation with visual architecture successfully saved to: {output_path}")
 
 if __name__ == "__main__":
     create_nexora_white_presentation()
