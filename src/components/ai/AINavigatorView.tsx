@@ -17,7 +17,7 @@ import {
   X
 } from 'lucide-react';
 import type { UserProfile } from '../../engine/types';
-import { generateContextAwareAIResponse } from '../../engine/aiNavigator';
+import { generateContextAwareAIResponse, getGoalAwareNavigatorConfig } from '../../engine/aiNavigator';
 import type { AIMessage } from '../../engine/aiNavigator';
 import { getGeminiApiKey, setGeminiApiKey, isGeminiConfigured, testGeminiConnection } from '../../engine/geminiAI';
 
@@ -27,21 +27,15 @@ interface AINavigatorViewProps {
 }
 
 export const AINavigatorView: React.FC<AINavigatorViewProps> = ({ profile, onNavigate }) => {
+  const goalConfig = getGoalAwareNavigatorConfig(profile);
+
   const [messages, setMessages] = useState<AIMessage[]>([
     {
       id: 'init-1',
       sender: 'assistant',
-      content: `Hello ${profile.fullName.split(' ')[0]}! I am your **NEXORA AI Learning & Career Navigator**.\n\n` +
-        `I am continuously tracking your journey toward **${profile.goalTitle}**.\n\n` +
-        `Ask me anything! Whether you need a step-by-step roadmap for Java, Python, C++, or Web Dev, concept explanations with code, interview preparation tips, or personalized study guidance — I'm here for you 24/7.`,
+      content: goalConfig.greeting,
       timestamp: 'Just now',
-      suggestedActions: [
-        { label: 'Java Mastery Roadmap', actionType: 'PROMPT', payload: 'Provide a complete step by step Java mastery roadmap' },
-        { label: 'What should I learn next?', actionType: 'PROMPT', payload: 'What should I learn next based on my profile?' },
-        { label: 'Explain OOP Concepts', actionType: 'PROMPT', payload: 'Explain the 4 pillars of OOP with real world examples' },
-        { label: 'Explain Hashing Intuition', actionType: 'PROMPT', payload: 'Explain Hashing and Hash Maps intuition' },
-        { label: 'How to improve ATS Resume?', actionType: 'PROMPT', payload: 'How to improve my technical ATS resume?' },
-      ]
+      suggestedActions: goalConfig.suggestedActions
     }
   ]);
 
@@ -180,18 +174,14 @@ export const AINavigatorView: React.FC<AINavigatorViewProps> = ({ profile, onNav
   };
 
   const handleResetChat = () => {
+    const freshConfig = getGoalAwareNavigatorConfig(profile);
     setMessages([
       {
         id: `init-${Date.now()}`,
         sender: 'assistant',
-        content: `Chat session refreshed! How can I assist your study session for **${profile.goalTitle}** right now?`,
+        content: `Chat session refreshed! How can I assist your preparation for **${profile.goalTitle}** right now?`,
         timestamp: 'Just now',
-        suggestedActions: [
-          { label: 'Java Mastery Roadmap', actionType: 'PROMPT', payload: 'Provide a complete step by step Java mastery roadmap' },
-          { label: 'What should I learn next?', actionType: 'PROMPT', payload: 'What should I learn next?' },
-          { label: 'Explain OOP Concepts', actionType: 'PROMPT', payload: 'Explain the 4 pillars of OOP' },
-          { label: 'Explain Hashing Intuition', actionType: 'PROMPT', payload: 'Explain Hashing and Hash Maps intuition' }
-        ]
+        suggestedActions: freshConfig.suggestedActions
       }
     ]);
   };
@@ -286,7 +276,7 @@ export const AINavigatorView: React.FC<AINavigatorViewProps> = ({ profile, onNav
       <div className="p-6 rounded-2xl bg-slate-900/80 border border-white/[0.08] backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold tracking-wider text-brand-400 uppercase">Personal AI Tutor</span>
+            <span className="text-xs font-semibold tracking-wider text-brand-400 uppercase">Personalized AI Mentor</span>
             
             {/* Live AI status indicator */}
             {isLiveActive ? (
@@ -297,17 +287,17 @@ export const AINavigatorView: React.FC<AINavigatorViewProps> = ({ profile, onNav
             ) : (
               <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                Smart AI Engine (Local)
+                Goal-Calibrated AI Engine
               </span>
             )}
           </div>
 
           <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
             <Bot className="w-6 h-6 text-brand-400" />
-            <span>AI Learning & Career Navigator</span>
+            <span>AI Learning & Path Navigator</span>
           </h1>
           <p className="text-xs text-slate-400">
-            Answers any programming question, designs custom roadmaps, clarifies doubts, and guides your study.
+            Tailored specifically for <strong>{profile.goalTitle}</strong> ({profile.educationLevel}).
           </p>
         </div>
 
@@ -441,7 +431,7 @@ export const AINavigatorView: React.FC<AINavigatorViewProps> = ({ profile, onNav
               type="text"
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
-              placeholder={isListening ? "Listening to your voice..." : "Ask any question, roadmap request, or code doubt (e.g. Master Java, explain recursion)..."}
+              placeholder={isListening ? "Listening to your voice..." : goalConfig.inputPlaceholder}
               className="flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-800 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all"
             />
 
