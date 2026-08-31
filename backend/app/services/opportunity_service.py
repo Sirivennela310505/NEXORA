@@ -1,17 +1,21 @@
-from app.database.models import Opportunity, UserOpportunity
+from app.database.models import Opportunity, user_opportunities
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 def get_all_opportunities(db: Session):
     return db.query(Opportunity).all()
 
 def save_user_opportunity(db: Session, user_id: int, opportunity_id: int):
-    # Check if already saved
-    existing = db.query(UserOpportunity).filter_by(user_id=user_id, opportunity_id=opportunity_id).first()
+    # Check if already saved via association table
+    existing = db.execute(
+        select(user_opportunities).where(
+            user_opportunities.c.user_id == user_id,
+            user_opportunities.c.opportunity_id == opportunity_id
+        )
+    ).first()
     if existing:
         return db.query(Opportunity).filter_by(id=opportunity_id).first()
-    # Create association
-    association = UserOpportunity(user_id=user_id, opportunity_id=opportunity_id)
-    db.add(association)
+    # Insert into association table
+    db.execute(user_opportunities.insert().values(user_id=user_id, opportunity_id=opportunity_id))
     db.commit()
-    db.refresh(association)
     return db.query(Opportunity).filter_by(id=opportunity_id).first()
