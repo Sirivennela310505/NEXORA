@@ -11,11 +11,13 @@ class Settings(BaseSettings):
     ALGORITHM: str = Field(default="HS256")
     # CORS
     FRONTEND_URL: str = Field(default="http://localhost:5173")
-    # LLM configuration (generic)
+    # LLM configuration
     LLM_API_URL: str = Field(default="")
     LLM_API_KEY: str = Field(default="")
+    GEMINI_API_KEY: str = Field(default="")
+    VITE_GEMINI_API_KEY: str = Field(default="")
 
-    model_config = {"env_file": os.path.join(os.path.dirname(__file__), "..", "..", "..", ".env"), "env_file_encoding": "utf-8"}
+    model_config = {"env_file": os.path.join(os.path.dirname(__file__), "..", "..", "..", ".env"), "env_file_encoding": "utf-8", "extra": "ignore"}
 
 @lru_cache()
 def get_settings() -> Settings:
