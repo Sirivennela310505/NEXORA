@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NEXORA — Talent Innovators Presentation Deck</title>
+  <title>NEXORA SaaS — Executive Presentation Deck</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,341 +11,320 @@
   <style>
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #07090e;
-      color: #f8fafc;
+      background-color: #f8fafc;
+      color: #0f172a;
       overflow: hidden;
     }
     .slide {
       display: none;
       height: 100vh;
-      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .slide.active {
       display: flex;
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.98); }
-      to { opacity: 1; transform: scale(1); }
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .glass-card {
-      background: rgba(19, 26, 42, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
+    .white-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
     }
   </style>
 </head>
-<body class="select-none">
+<body class="select-none bg-slate-50 text-slate-900">
 
-  <!-- Top Progress Bar & Header -->
-  <div class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-4 bg-slate-950/80 border-b border-white/[0.08] backdrop-blur-md">
+  <!-- Top Navigation & Progress Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-3.5 bg-white/90 border-b border-slate-200 backdrop-blur-md shadow-xs">
     <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-xl bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center font-black text-indigo-400 text-sm">
+      <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-sm shadow-md shadow-indigo-500/20">
         N
       </div>
       <div>
-        <h1 class="text-sm font-bold text-white tracking-tight">NEXORA — Presentation Deck</h1>
-        <p class="text-[11px] text-slate-400">Presented by Team: <strong class="text-indigo-400">Talent Innovators</strong></p>
+        <h1 class="text-sm font-bold text-slate-900 tracking-tight">NEXORA SaaS — Executive Slide Deck</h1>
+        <p class="text-[11px] text-slate-500 font-medium">Presented by: <strong class="text-indigo-600">Talent Innovators</strong></p>
       </div>
     </div>
 
-    <div class="flex items-center gap-4 text-xs font-semibold text-slate-400">
-      <span>Slide <span id="currentSlideNum" class="text-white">1</span> / <span id="totalSlidesNum">8</span></span>
-      <div class="flex items-center gap-1">
-        <button onclick="prevSlide()" class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition">
+    <div class="flex items-center gap-4 text-xs font-semibold text-slate-500">
+      <span>Slide <span id="currentSlideNum" class="text-indigo-600 font-bold">1</span> / <span id="totalSlidesNum">7</span></span>
+      <div class="flex items-center gap-1.5">
+        <button onclick="prevSlide()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-medium transition cursor-pointer">
           ← Prev
         </button>
-        <button onclick="nextSlide()" class="p-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-md shadow-indigo-500/20">
+        <button onclick="nextSlide()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition shadow-sm cursor-pointer">
           Next →
         </button>
       </div>
     </div>
-  </div>
+  </header>
 
   <!-- Main Slides Container -->
   <main class="w-full h-full pt-16">
 
     <!-- SLIDE 1: Title Slide -->
     <section class="slide active flex-col items-center justify-center text-center px-6 max-w-5xl mx-auto" id="slide-1">
-      <div class="space-y-6">
-        <span class="px-4 py-1.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-xs font-bold uppercase tracking-widest">
-          AI-Powered Educational & Career Platform
+      <div class="white-card p-12 rounded-3xl space-y-6 w-full max-w-4xl border border-slate-200 shadow-xl">
+        <span class="px-3.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-bold uppercase tracking-wider">
+          AI-Powered Course Recommendation & Dynamic Roadmap Engine
         </span>
-        <h1 class="text-6xl sm:text-7xl font-extrabold text-white tracking-tight leading-tight">
-          NEXORA
+        
+        <h1 class="text-5xl sm:text-6xl font-extrabold text-slate-900 tracking-tight">
+          NEXORA SaaS
         </h1>
-        <p class="text-2xl font-bold bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-          Context-Aware Dynamic AI Learning Pathfinder & Placement Navigator
+        
+        <p class="text-xl font-bold text-indigo-600 max-w-2xl mx-auto">
+          Automated Career Navigation & Custom Curriculum Sequencing
         </p>
-        <p class="text-base text-slate-400 max-w-3xl mx-auto leading-relaxed">
-          Empowering every learner with real-time adaptive roadmaps, automated diagnostic skill gap matrices, and 24/7 personalized AI guidance.
+
+        <p class="text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          Empowering learners with real-time topological prerequisite DAGs, automated diagnostic skill gap matrices, ATS resume scoring, and 24/7 personalized multimodal AI tutoring.
         </p>
-        <div class="pt-4 flex items-center justify-center gap-4 text-xs font-medium text-slate-400">
-          <span class="px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-emerald-400">Live Web App Active</span>
-          <span>•</span>
-          <span>Google Gemini AI</span>
-          <span>•</span>
-          <span>Team: Talent Innovators</span>
-        </div>
-      </div>
-    </section>
 
-    <!-- SLIDE 2: Presenter Information -->
-    <section class="slide flex-col justify-center px-12 max-w-6xl mx-auto" id="slide-2">
-      <div class="space-y-2 mb-8">
-        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Presenter Details</span>
-        <h2 class="text-3xl font-extrabold text-white">Project Presentation Team</h2>
-        <p class="text-sm text-slate-400">The innovators behind NEXORA's design and execution</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Team Box -->
-        <div class="glass-card p-8 rounded-2xl space-y-6 border-l-4 border-l-indigo-500">
-          <div>
-            <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Team Name</span>
-            <h3 class="text-3xl font-extrabold text-white mt-1">Talent Innovators</h3>
+        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-slate-600">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Presenter: <strong class="text-slate-900">Talent Innovators</strong></span>
           </div>
           <div>
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Project Track / Theme</span>
-            <p class="text-base font-bold text-indigo-300 mt-1">AI in Education, Adaptive Learning & Career Placement</p>
-          </div>
-          <div class="pt-4 border-t border-slate-800 text-xs text-slate-400">
-            <span>Project: <strong>NEXORA AI Learning Pathfinder</strong></span>
-          </div>
-        </div>
-
-        <!-- Members Box (Empty for fill-in) -->
-        <div class="glass-card p-8 rounded-2xl space-y-4 border-l-4 border-l-emerald-500">
-          <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Team Members</span>
-          <div class="space-y-4 pt-2 text-sm text-slate-200">
-            <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-              <span class="text-slate-400">1.</span> <span class="text-white font-medium pl-2">___________________________________</span> <span class="text-xs text-indigo-400 float-right">(Team Lead)</span>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-              <span class="text-slate-400">2.</span> <span class="text-white font-medium pl-2">___________________________________</span> <span class="text-xs text-cyan-400 float-right">(Developer / AI)</span>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-              <span class="text-slate-400">3.</span> <span class="text-white font-medium pl-2">___________________________________</span> <span class="text-xs text-emerald-400 float-right">(Developer / UI)</span>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-              <span class="text-slate-400">4.</span> <span class="text-white font-medium pl-2">___________________________________</span> <span class="text-xs text-amber-400 float-right">(Research / QA)</span>
-            </div>
+            <span>Live Application: <a href="https://nexora-path-finder.vercel.app" target="_blank" class="text-indigo-600 hover:underline font-bold">nexora-path-finder.vercel.app</a></span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 3: Problem Understanding -->
-    <section class="slide flex-col justify-center px-12 max-w-6xl mx-auto" id="slide-3">
-      <div class="space-y-2 mb-8">
-        <span class="text-xs font-bold text-rose-400 uppercase tracking-wider">Problem Understanding</span>
-        <h2 class="text-3xl font-extrabold text-white">Key Challenges in Modern Technical Education</h2>
-        <p class="text-sm text-slate-400">Why traditional learning platforms fail 90% of students before job readiness</p>
+    <!-- SLIDE 2: Problem Understanding -->
+    <section class="slide flex-col justify-center px-10 max-w-6xl mx-auto" id="slide-2">
+      <div class="space-y-1 mb-8">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Slide 02</span>
+        <h2 class="text-3xl font-extrabold text-slate-900">Problem Understanding</h2>
+        <p class="text-sm text-slate-500">The structural gaps causing online students to struggle and abandon learning paths</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="white-card p-6 rounded-2xl space-y-3 border-t-4 border-t-indigo-600">
+          <h3 class="text-base font-bold text-slate-900">The Gap</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Online learners struggle with severe information overload, finding truly relevant technical courses, and creating coherent, structured learning sequences across hundreds of fragmented video tutorials.
+          </p>
+        </div>
+
+        <div class="white-card p-6 rounded-2xl space-y-3 border-t-4 border-t-rose-500">
+          <h3 class="text-base font-bold text-slate-900">Core Pain Points</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            • <strong>Lack of Goal Alignment:</strong> Generic courses treat beginners and switchers identically.<br>
+            • <strong>Absence of Prerequisite Clarity:</strong> Unidentified skill gaps cause failure in advanced topics.<br>
+            • <strong>Static Paths:</strong> Playlists that cannot adapt to individual progress.
+          </p>
+        </div>
+
+        <div class="white-card p-6 rounded-2xl space-y-3 border-t-4 border-t-emerald-600">
+          <h3 class="text-base font-bold text-slate-900">Our Mission</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Build an intelligent SaaS platform that recommends personalized courses, explains their technical relevance using LLMs, visualizes prerequisite dependency DAGs, and builds dynamic milestones.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: Solution Approach -->
+    <section class="slide flex-col justify-center px-10 max-w-6xl mx-auto" id="slide-3">
+      <div class="space-y-1 mb-8">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Slide 03</span>
+        <h2 class="text-3xl font-extrabold text-slate-900">Solution Approach</h2>
+        <p class="text-sm text-slate-500">How NEXORA solves curriculum sequencing and career navigation</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-        <div class="glass-card p-6 rounded-2xl space-y-2 border-l-4 border-l-rose-500">
-          <h3 class="text-base font-bold text-rose-300">1. Rigid, Linear Video Courses</h3>
-          <p class="text-slate-400 leading-relaxed">
-            Static video playlists treat absolute beginners and experienced learners identically, causing cognitive fatigue on known topics and abandonment on hard ones.
+        <div class="white-card p-6 rounded-2xl space-y-2 border-l-4 border-l-indigo-600">
+          <h3 class="text-sm font-bold text-slate-900">1. Smart Goal Matching</h3>
+          <p class="text-slate-600 leading-relaxed">
+            Synthesizes user voice/text inputs to match career targets (SWE, AI/ML, JEE, NEET, Data Science, Career Switch) directly to curated technical modules and prerequisite benchmarks.
           </p>
         </div>
 
-        <div class="glass-card p-6 rounded-2xl space-y-2 border-l-4 border-l-amber-500">
-          <h3 class="text-base font-bold text-amber-300">2. Undetected Prerequisite Gaps</h3>
-          <p class="text-slate-400 leading-relaxed">
-            Students jump directly into advanced topics (like Dynamic Programming or Rotational Dynamics) without mastering basic foundations, creating recurring bottlenecks.
+        <div class="white-card p-6 rounded-2xl space-y-2 border-l-4 border-l-cyan-600">
+          <h3 class="text-sm font-bold text-slate-900">2. Real-time Explanation Engine</h3>
+          <p class="text-slate-600 leading-relaxed">
+            Automated curriculum analysis breaking down each milestone into prerequisites, core topics, verified 100% free learning resources, and capstone project architectures.
           </p>
         </div>
 
-        <div class="glass-card p-6 rounded-2xl space-y-2 border-l-4 border-l-indigo-500">
-          <h3 class="text-base font-bold text-indigo-300">3. Analysis Paralysis & Noise</h3>
-          <p class="text-slate-400 leading-relaxed">
-            With millions of scattered YouTube videos and blog posts, students waste hours researching what they should realistically study today.
+        <div class="white-card p-6 rounded-2xl space-y-2 border-l-4 border-l-emerald-600">
+          <h3 class="text-sm font-bold text-slate-900">3. Dynamic DAG Sequencing</h3>
+          <p class="text-slate-600 leading-relaxed">
+            Generates topological step-by-step milestones (Completed, In Progress, Unlocked, Locked, Remediation) tailored to career targets and performance scores.
           </p>
         </div>
 
-        <div class="glass-card p-6 rounded-2xl space-y-2 border-l-4 border-l-cyan-500">
-          <h3 class="text-base font-bold text-cyan-300">4. The Industry Screening Disconnect</h3>
-          <p class="text-slate-400 leading-relaxed">
-            Learners finish tutorials but fail technical screening rounds because they lack ATS-optimized resume formatting and verified diagnostic assessment proof.
+        <div class="white-card p-6 rounded-2xl space-y-2 border-l-4 border-l-amber-600">
+          <h3 class="text-sm font-bold text-slate-900">4. Secure Workspaces & ATS Readiness</h3>
+          <p class="text-slate-600 leading-relaxed">
+            Persistent local session storage with optional Firebase cloud sync, paired with an automated ATS resume builder calculating real-time recruiter match scores.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 4: What We Solved -->
-    <section class="slide flex-col justify-center px-12 max-w-6xl mx-auto" id="slide-4">
-      <div class="space-y-2 mb-6">
-        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Our Solution</span>
-        <h2 class="text-3xl font-extrabold text-white">What We Solved with NEXORA</h2>
-        <p class="text-sm text-slate-400">A complete paradigm shift from passive video consumption to active, goal-driven navigation</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-        <div class="glass-card p-4 rounded-xl space-y-1.5 border-t-2 border-t-cyan-400">
-          <span class="text-cyan-400 font-bold text-sm">✅ Dynamic Flowchart DAGs</span>
-          <p class="text-slate-400 leading-relaxed">Interactive Directed Acyclic Graphs that visually unlock milestones based on strict prerequisite completion and remediation triggers.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-1.5 border-t-2 border-t-emerald-400">
-          <span class="text-emerald-400 font-bold text-sm">✅ Diagnostic Gap Matrix</span>
-          <p class="text-slate-400 leading-relaxed">Automated MCQ engine calculating real-time mastery percentages and revealing critical skill gaps before advancing.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-1.5 border-t-2 border-t-indigo-400">
-          <span class="text-indigo-400 font-bold text-sm">✅ Next-Best-Action (NBA)</span>
-          <p class="text-slate-400 leading-relaxed">Eliminates decision paralysis by computing a student's single highest-leverage task for today based on active gaps.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-1.5 border-t-2 border-t-purple-400">
-          <span class="text-purple-400 font-bold text-sm">✅ 24/7 AI Navigator Chat</span>
-          <p class="text-slate-400 leading-relaxed">Google Gemini 1.5 Flash live reasoning for concept breakdowns, code snippets, comparisons, and personalized study advice.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-1.5 border-t-2 border-t-cyan-400">
-          <span class="text-cyan-400 font-bold text-sm">✅ ATS Resume Optimizer</span>
-          <p class="text-slate-400 leading-relaxed">Automated ATS analyzer with Google XYZ bullet optimizers and instant PDF export to bridge the gap between learning and hiring.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-1.5 border-t-2 border-t-amber-400">
-          <span class="text-amber-400 font-bold text-sm">✅ 100% Free Resources</span>
-          <p class="text-slate-400 leading-relaxed">Curated zero-cost materials from MIT OpenCourseWare, Harvard CS50, Disha, HCV, and freeCodeCamp.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- SLIDE 5: Multi-Domain Personalization -->
-    <section class="slide flex-col justify-center px-12 max-w-6xl mx-auto" id="slide-5">
-      <div class="space-y-2 mb-6">
-        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Universal Adaptability</span>
-        <h2 class="text-3xl font-extrabold text-white">Engineered for Diverse Student Goals</h2>
-        <p class="text-sm text-slate-400">Dynamic domain calibration adjusts greetings, diagnostic quizzes, and roadmap logic</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-        <div class="glass-card p-4 rounded-xl space-y-2 border-t-2 border-t-cyan-400">
-          <h3 class="font-bold text-white flex items-center gap-1.5">🎯 JEE Main & Advanced</h3>
-          <p class="text-slate-400 leading-relaxed">Calculus derivations, Rotational Mechanics, Organic Mechanisms, and 3-hour exam time strategy.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-2 border-t-2 border-t-emerald-400">
-          <h3 class="font-bold text-white flex items-center gap-1.5">🩺 NEET (Medical)</h3>
-          <p class="text-slate-400 leading-relaxed">NCERT line-by-line Biology 360/360, Botany diagrams, Inorganic Chemistry exceptions, and Physics numericals.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-2 border-t-2 border-t-indigo-400">
-          <h3 class="font-bold text-white flex items-center gap-1.5">💻 SWE & Placements</h3>
-          <p class="text-slate-400 leading-relaxed">DSA patterns, System Design, Core CS (OS/DBMS), Java/C++/Python roadmaps, and ATS resume scoring.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-2 border-t-2 border-t-purple-400">
-          <h3 class="font-bold text-white flex items-center gap-1.5">🤖 AI & Machine Learning</h3>
-          <p class="text-slate-400 leading-relaxed">Linear Algebra, PyTorch neural networks, Vector Databases, RAG architectures, and fine-tuning.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-2 border-t-2 border-t-amber-400">
-          <h3 class="font-bold text-white flex items-center gap-1.5">🔄 Career Switchers</h3>
-          <p class="text-slate-400 leading-relaxed">0-to-1 programming foundations, high-impact recruiter portfolio projects, and fast-track transition roadmaps.</p>
-        </div>
-        <div class="glass-card p-4 rounded-xl space-y-2 border-t-2 border-t-rose-400">
-          <h3 class="font-bold text-white flex items-center gap-1.5">📊 Data Science</h3>
-          <p class="text-slate-400 leading-relaxed">SQL window functions, Pandas data wrangling, Exploratory Data Analysis, and Statistical Modeling.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- SLIDE 6: Technology Stack -->
-    <section class="slide flex-col justify-center px-12 max-w-6xl mx-auto" id="slide-6">
-      <div class="space-y-2 mb-6">
-        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Architecture</span>
-        <h2 class="text-3xl font-extrabold text-white">Production-Grade Modern Tech Stack</h2>
-        <p class="text-sm text-slate-400">High-performance frontend paired with generative intelligence</p>
+    <!-- SLIDE 4: System Architecture -->
+    <section class="slide flex-col justify-center px-10 max-w-6xl mx-auto" id="slide-4">
+      <div class="space-y-1 mb-8">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Slide 04</span>
+        <h2 class="text-3xl font-extrabold text-slate-900">System Architecture</h2>
+        <p class="text-sm text-slate-500">Modular high-performance architecture built for zero latency and high availability</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-        <div class="glass-card p-5 rounded-2xl space-y-2">
-          <h3 class="font-bold text-cyan-400 text-sm">Frontend & User Experience</h3>
-          <ul class="space-y-1.5 text-slate-300">
-            <li>• <strong>React 19:</strong> Fast concurrent rendering with modern hooks.</li>
-            <li>• <strong>TypeScript:</strong> 100% strict type safety across state & models.</li>
-            <li>• <strong>TailwindCSS:</strong> Dark glassmorphism interface with smooth animations.</li>
-            <li>• <strong>Lucide Icons & Web Speech API:</strong> Multimodal text + voice input.</li>
-          </ul>
+        <div class="white-card p-6 rounded-2xl space-y-2.5">
+          <h3 class="text-sm font-bold text-indigo-600">Frontend Application Layer</h3>
+          <p class="text-slate-600 leading-relaxed">
+            • <strong>React 19 & TypeScript:</strong> Concurrent rendering with end-to-end type safety.<br>
+            • <strong>TailwindCSS:</strong> Clean executive styling with light/dark glassmorphism design tokens.<br>
+            • <strong>Web Speech API:</strong> Multimodal speech-to-text intake and conversational tutor.
+          </p>
         </div>
 
-        <div class="glass-card p-5 rounded-2xl space-y-2">
-          <h3 class="font-bold text-indigo-400 text-sm">AI Engine & Algorithms</h3>
-          <ul class="space-y-1.5 text-slate-300">
-            <li>• <strong>Google Gemini API:</strong> Gemini 1.5 Flash & 2.0 reasoning.</li>
-            <li>• <strong>DAG Engine:</strong> Topological sort for prerequisite node unlocking.</li>
-            <li>• <strong>Smart Local Engine:</strong> Intent classification & offline fallback.</li>
-            <li>• <strong>What-If Simulator:</strong> Dynamic timeline calibration calculations.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- SLIDE 7: Measurable Impact -->
-    <section class="slide flex-col justify-center px-12 max-w-6xl mx-auto" id="slide-7">
-      <div class="space-y-2 mb-8 text-center">
-        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Outcomes</span>
-        <h2 class="text-3xl font-extrabold text-white">Measurable Educational Impact</h2>
-        <p class="text-sm text-slate-400">Delivering superior student retention and career outcomes</p>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-5">
-        <div class="glass-card p-6 rounded-2xl text-center space-y-2 border-t-2 border-t-cyan-400">
-          <div class="text-4xl font-extrabold text-cyan-400">3.2x</div>
-          <h3 class="font-bold text-white text-sm">Higher Completion</h3>
-          <p class="text-xs text-slate-400">Dynamic prerequisite branching prevents dropouts.</p>
+        <div class="white-card p-6 rounded-2xl space-y-2.5">
+          <h3 class="text-sm font-bold text-cyan-600">Adaptive Engine & Algorithms</h3>
+          <p class="text-slate-600 leading-relaxed">
+            • <strong>Topological DAG Engine:</strong> Graph-based prerequisite dependency resolving.<br>
+            • <strong>Diagnostic Gap Engine:</strong> Mathematical scoring of skill mastery against benchmarks.<br>
+            • <strong>Next-Best-Action (NBA):</strong> Real-time heuristic single-task prioritization.
+          </p>
         </div>
 
-        <div class="glass-card p-6 rounded-2xl text-center space-y-2 border-t-2 border-t-emerald-400">
-          <div class="text-4xl font-extrabold text-emerald-400">88%+</div>
-          <h3 class="font-bold text-white text-sm">Average ATS Score</h3>
-          <p class="text-xs text-slate-400">Built-in XYZ bullet formula ensures recruiter readiness.</p>
+        <div class="white-card p-6 rounded-2xl space-y-2.5">
+          <h3 class="text-sm font-bold text-emerald-600">AI Services & LLM Layer</h3>
+          <p class="text-slate-600 leading-relaxed">
+            • <strong>Google Gemini API:</strong> Gemini 1.5 Flash & 2.0 multi-turn conversational reasoning.<br>
+            • <strong>Semantic Intent Fallback:</strong> Offline intelligence for technical queries and code syntax.<br>
+            • <strong>Dynamic Schema Prompter:</strong> Generates structured milestones and diagnostic MCQs.
+          </p>
         </div>
 
-        <div class="glass-card p-6 rounded-2xl text-center space-y-2 border-t-2 border-t-indigo-400">
-          <div class="text-4xl font-extrabold text-indigo-400">100%</div>
-          <h3 class="font-bold text-white text-sm">Free Resources</h3>
-          <p class="text-xs text-slate-400">Zero course fees with verified top open-source materials.</p>
-        </div>
-
-        <div class="glass-card p-6 rounded-2xl text-center space-y-2 border-t-2 border-t-purple-400">
-          <div class="text-4xl font-extrabold text-purple-400">24/7</div>
-          <h3 class="font-bold text-white text-sm">AI Guidance</h3>
-          <p class="text-xs text-slate-400">Instant doubt resolution and personalized study pacing.</p>
+        <div class="white-card p-6 rounded-2xl space-y-2.5">
+          <h3 class="text-sm font-bold text-amber-600">Storage & Deployment Pipeline</h3>
+          <p class="text-slate-600 leading-relaxed">
+            • <strong>Persistent Client Cache:</strong> Zero-latency local storage state sync.<br>
+            • <strong>Firebase Cloud:</strong> Optional cloud authentication and profile backup.<br>
+            • <strong>Deployment:</strong> GitHub repository auto-deployed via Vercel edge network.
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- SLIDE 8: Conclusion -->
-    <section class="slide flex-col items-center justify-center text-center px-6 max-w-4xl mx-auto" id="slide-8">
-      <div class="space-y-6">
-        <span class="px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold uppercase tracking-widest">
-          Transforming Education
+    <!-- SLIDE 5: AI & ML Techniques Used -->
+    <section class="slide flex-col justify-center px-10 max-w-6xl mx-auto" id="slide-5">
+      <div class="space-y-1 mb-8">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Slide 05</span>
+        <h2 class="text-3xl font-extrabold text-slate-900">AI & ML Techniques Used</h2>
+        <p class="text-sm text-slate-500">Core algorithmic and generative AI methods powering the platform</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+        <div class="white-card p-6 rounded-2xl space-y-2.5">
+          <h3 class="text-sm font-bold text-indigo-600">1. Large Language Model Integration</h3>
+          <p class="text-slate-600 leading-relaxed">
+            Google Gemini 1.5 Flash API with dynamic context injection. Transmits student goal titles, education level, active milestones, and diagnostic history to deliver hyper-personalized coaching and code explanations.
+          </p>
+        </div>
+
+        <div class="white-card p-6 rounded-2xl space-y-2.5">
+          <h3 class="text-sm font-bold text-cyan-600">2. Topological Graph Traversal (DAG)</h3>
+          <p class="text-slate-600 leading-relaxed">
+            Graph-theoretic prerequisite trees where skills are nodes and dependencies are directed edges. Automatically triggers remedial sub-branches when assessment scores fall below threshold benchmarks (70%).
+          </p>
+        </div>
+
+        <div class="white-card p-6 rounded-2xl space-y-2.5">
+          <h3 class="text-sm font-bold text-emerald-600">3. Structured Output & JSON Enforcement</h3>
+          <p class="text-slate-600 leading-relaxed">
+            Enforces strict JSON schema generation to dynamically build 8-stage roadmap milestones, diagnostic MCQs with explanation keys, and goal-specific challenge vectors on the fly.
+          </p>
+        </div>
+
+        <div class="white-card p-6 rounded-2xl space-y-2.5">
+          <h3 class="text-sm font-bold text-amber-600">4. Latency & Offline Intent Management</h3>
+          <p class="text-slate-600 leading-relaxed">
+            Strict timeout handling with multi-tiered fallback to a local semantic intent engine that answers technology comparisons (Web Dev vs ML), OOP pillars, and DSA questions without UI freezing.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: Key Features & Core Workflows -->
+    <section class="slide flex-col justify-center px-10 max-w-6xl mx-auto" id="slide-6">
+      <div class="space-y-1 mb-8">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Slide 06</span>
+        <h2 class="text-3xl font-extrabold text-slate-900">Key Features & Core Workflows</h2>
+        <p class="text-sm text-slate-500">Integrated feature suite supporting continuous learner growth</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+        <div class="white-card p-4 rounded-xl space-y-1.5">
+          <span class="font-bold text-indigo-600">AI Goal Intake</span>
+          <p class="text-slate-600">Voice & text onboarding capturing targets and bottlenecks.</p>
+        </div>
+        <div class="white-card p-4 rounded-xl space-y-1.5">
+          <span class="font-bold text-cyan-600">Flowchart DAG</span>
+          <p class="text-slate-600">Interactive visual prerequisite roadmap with node status.</p>
+        </div>
+        <div class="white-card p-4 rounded-xl space-y-1.5">
+          <span class="font-bold text-emerald-600">Skill Gap Matrix</span>
+          <p class="text-slate-600">Diagnostic MCQs measuring mastery vs benchmark scores.</p>
+        </div>
+        <div class="white-card p-4 rounded-xl space-y-1.5">
+          <span class="font-bold text-amber-600">Next-Best-Action</span>
+          <p class="text-slate-600">Single highest-leverage task recommendation for today.</p>
+        </div>
+        <div class="white-card p-4 rounded-xl space-y-1.5">
+          <span class="font-bold text-indigo-600">AI Navigator Tutor</span>
+          <p class="text-slate-600">24/7 chatbot with code copy buttons and comparison logic.</p>
+        </div>
+        <div class="white-card p-4 rounded-xl space-y-1.5">
+          <span class="font-bold text-cyan-600">ATS Resume Builder</span>
+          <p class="text-slate-600">Live score analyzer, Google XYZ bullets, & PDF export.</p>
+        </div>
+        <div class="white-card p-4 rounded-xl space-y-1.5">
+          <span class="font-bold text-emerald-600">What-If Simulator</span>
+          <p class="text-slate-600">Pacing model calculating completion shifts based on hours.</p>
+        </div>
+        <div class="white-card p-4 rounded-xl space-y-1.5">
+          <span class="font-bold text-amber-600">Free Books & Catalog</span>
+          <p class="text-slate-600">100% verified materials from MIT, CS50, HCV, & Disha.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: Conclusion & Summary -->
+    <section class="slide flex-col items-center justify-center text-center px-6 max-w-4xl mx-auto" id="slide-7">
+      <div class="white-card p-10 rounded-3xl space-y-6 w-full border border-slate-200 shadow-xl">
+        <span class="px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold uppercase tracking-wider">
+          Summary & Live Demonstration
         </span>
-        <h2 class="text-5xl font-extrabold text-white tracking-tight">
+        <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">
           Thank You! Experience NEXORA Live
         </h2>
-        <p class="text-base text-slate-400 leading-relaxed">
-          NEXORA turns overwhelming syllabi into structured, daily actionable milestones tailored to every student's dream goal.
+        <p class="text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          NEXORA transforms passive online video consumption into an active, goal-driven navigation engine that guides students from Day 1 to career placement.
         </p>
 
-        <div class="glass-card p-6 rounded-2xl max-w-md mx-auto space-y-3 text-xs text-left">
+        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 max-w-lg mx-auto space-y-3 text-xs text-left">
           <div class="flex items-center justify-between">
-            <span class="text-slate-400">Team:</span>
-            <span class="text-indigo-400 font-bold">Talent Innovators</span>
+            <span class="text-slate-500 font-medium">Presenter Team:</span>
+            <span class="text-indigo-600 font-bold">Talent Innovators</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-slate-400">Live Application:</span>
-            <a href="https://nexora-path-finder.vercel.app" target="_blank" class="text-indigo-400 hover:underline font-bold">nexora-path-finder.vercel.app</a>
+            <span class="text-slate-500 font-medium">Live Web Application:</span>
+            <a href="https://nexora-path-finder.vercel.app" target="_blank" class="text-indigo-600 hover:underline font-bold">nexora-path-finder.vercel.app</a>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-slate-400">GitHub Source:</span>
-            <a href="https://github.com/Sirivennela310505/NEXORA" target="_blank" class="text-indigo-400 hover:underline font-bold">Sirivennela310505/NEXORA</a>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-slate-400">AI Engine:</span>
-            <span class="text-emerald-400 font-bold">Google Gemini 1.5 Flash</span>
+            <span class="text-slate-500 font-medium">GitHub Repository:</span>
+            <a href="https://github.com/Sirivennela310505/NEXORA" target="_blank" class="text-indigo-600 hover:underline font-bold">Sirivennela310505/NEXORA</a>
           </div>
         </div>
-
-        <p class="text-xs text-slate-500">
-          Use Left/Right arrow keys to navigate slides. Press F11 for Full Screen Presentation.
-        </p>
       </div>
     </section>
 
@@ -353,7 +332,7 @@
 
   <script>
     let currentSlide = 1;
-    const totalSlides = 8;
+    const totalSlides = 7;
 
     function showSlide(n) {
       document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
