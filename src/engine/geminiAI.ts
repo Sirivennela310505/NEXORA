@@ -1,27 +1,205 @@
 /**
  * NEXORA — Gemini AI Service
  * Dynamically generates goal-specific challenges, roadmap milestones,
- * and diagnostic questions for ANY user goal using Gemini 1.5 Flash API.
- * Falls back gracefully if no API key is set.
+ * diagnostic questions, and live conversational AI answers using Google Gemini API.
+ * Supports dynamic API key configuration and fallback models.
  */
-import type { Milestone, DiagnosticQuestion } from './types';
+import type { Milestone, DiagnosticQuestion, UserProfile } from './types';
 
-const GEMINI_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+const STORAGE_KEY_GEMINI = 'nexora_gemini_api_key';
 
-async function callGemini(prompt: string): Promise<string> {
-  if (!GEMINI_API_KEY) throw new Error('No API key');
-  const res = await fetch(GEMINI_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
-    })
+export function getGeminiApiKey(): string {
+  const customKey = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY_GEMINI) : '';
+  if (customKey && customKey.trim().length > 5) return customKey.trim();
+  const envKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+  if (envKey && envKey !== 'your_gemini_api_key_here' && envKey.trim().length > 5) {
+    return envKey.trim();
+  }
+  return '';
+}
+
+export function setGeminiApiKey(key: string): void {
+  if (typeof window !== 'undefined') {
+    if (!key || key.trim() === '') {
+      localStorage.removeItem(STORAGE_KEY_GEMINI);
+    } else {
+      localStorage.setItem(STORAGE_KEY_GEMINI, key.trim());
+    }
+  }
+}
+
+export function isGeminiConfigured(): boolean {
+  const key = getGeminiApiKey();
+  return Boolean(key && key.length > 10 && key !== 'your_gemini_api_key_here');
+}
+
+export async function testGeminiConnection(keyToTest?: string): Promise<{ success: boolean; message: string }> {
+  const apiKey = keyToTest || getGeminiApiKey();
+  if (!apiKey) {
+    return { success: false, message: 'No Gemini API key provided.' };
+  }
+
+  const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'];
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: 'Hello, reply with "OK"' }] }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 20 }
+        })
+      });
+      if (res.ok) {
+        return { success: true, message: `Successfully connected to Google Gemini (${model})!` };
+      }
+    } catch {
+      // try next
+    }
+  }
+  return { success: false, message: 'Could not connect. Please verify your Gemini API key.' };
+}
+
+async function callGemini(prompt: string, maxTokens = 2048): Promise<string> {
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) throw new Error('No API key configured');
+
+  const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'];
+  let lastError: Error | null = null;
+
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens }
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return text;
+      } else {
+        const errText = await res.text().catch(() => '');
+        lastError = new Error(`Gemini ${model} ${res.status}: ${errText}`);
+      }
+    } catch (e: any) {
+      lastError = e;
+    }
+  }
+
+  throw lastError || new Error('All Gemini models failed');
+}
+
+/**
+ * Live multi-turn chat with Google Gemini tailored for student learning,
+ * roadmaps, code explanations, and doubt clearing.
+ */
+export async function callGeminiChat(
+  userMessage: string,
+  profile: UserProfile,
+  chatHistory: { sender: 'user' | 'assistant'; content: string }[] = []
+): Promise<string> {
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) throw new Error('No API key configured');
+
+  const completedMilestones = profile.activeRoadmap?.filter(m => m.status === 'completed').map(m => m.title).join(', ') || 'None yet';
+  const inProgressMilestones = profile.activeRoadmap?.filter(m => m.status === 'in_progress' || m.status === 'unlocked').map(m => m.title).join(', ') || 'Foundations';
+  const topSkills = profile.skills?.map(s => `${s.skillName} (${s.currentMastery || 0}%)`).slice(0, 6).join(', ') || 'General';
+
+  const systemInstruction = `You are NEXORA AI, an expert, enthusiastic, and direct personal AI Learning & Career Navigator for student "${profile.fullName}".
+Student Profile Context:
+- Target Goal: "${profile.goalTitle}" (${profile.goalCategory})
+- Education Level: "${profile.educationLevel}"
+- Daily Availability: ${profile.dailyAvailabilityMinutes || 90} minutes/day
+- Current Active Milestones: ${inProgressMilestones}
+- Completed Milestones: ${completedMilestones}
+- Current Skills & Mastery: ${topSkills}
+- Learning Preference: ${profile.learningPreference || 'Mixed'}
+
+Guidelines:
+1. ALWAYS answer the student's exact question or request directly, thoroughly, and helpfully. If they ask about Java, Python, C++, Web Dev, DSA, roadmaps, concepts, errors, exam tips, or doubts, provide accurate, structured, high-yield answers.
+2. If they ask for a roadmap or guide (e.g. "focus on java first", "give java roadmap"), provide a clear, phased, actionable breakdown with key topics, estimated time, and hands-on milestones.
+3. If they ask a conceptual doubt or code problem, provide clear intuitive explanations with well-formatted code snippets, edge cases, and best practices.
+4. Format your output in clean Markdown using bold titles, bullet points, and code blocks with language tags (e.g. \`\`\`java).
+5. Maintain a supportive, motivating tone and end with 1-2 actionable next steps or interactive practice suggestions.`;
+
+  // Build multi-turn context
+  const contents: any[] = [];
+  
+  // Format past turns (limit to last 6 for token efficiency)
+  const recentHistory = chatHistory.slice(-6);
+  for (const h of recentHistory) {
+    contents.push({
+      role: h.sender === 'user' ? 'user' : 'model',
+      parts: [{ text: h.content }]
+    });
+  }
+
+  // Append current user message with system context if first turn or injected
+  const currentUserText = contents.length === 0 
+    ? `${systemInstruction}\n\nStudent asks: "${userMessage}"`
+    : userMessage;
+
+  contents.push({
+    role: 'user',
+    parts: [{ text: currentUserText }]
   });
-  if (!res.ok) throw new Error(`Gemini ${res.status}`);
-  const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+  const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro'];
+  let lastError: Error | null = null;
+
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          systemInstruction: {
+            parts: [{ text: systemInstruction }]
+          },
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048
+          }
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return text;
+      } else {
+        // Fallback payload format for endpoints that don't support top-level systemInstruction
+        const fallbackRes = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              { role: 'user', parts: [{ text: `${systemInstruction}\n\n${userMessage}` }] }
+            ],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
+          })
+        });
+        if (fallbackRes.ok) {
+          const fbData = await fallbackRes.json();
+          const fbText = fbData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (fbText) return fbText;
+        }
+      }
+    } catch (e: any) {
+      lastError = e;
+    }
+  }
+
+  throw lastError || new Error('Failed to generate AI response from Gemini');
 }
 
 function parseJSON<T>(raw: string): T | null {
@@ -29,10 +207,6 @@ function parseJSON<T>(raw: string): T | null {
     const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     return JSON.parse(cleaned) as T;
   } catch { return null; }
-}
-
-export function isGeminiConfigured(): boolean {
-  return Boolean(GEMINI_API_KEY && GEMINI_API_KEY.length > 10);
 }
 
 /** Generate 6 goal-specific challenge options */
@@ -46,7 +220,7 @@ Make them very specific to this exact goal domain (not generic platitudes).
 Return ONLY a JSON array of 6 strings, no other text:
 ["Challenge 1", "Challenge 2", "Challenge 3", "Challenge 4", "Challenge 5", "Challenge 6"]`;
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGemini(prompt, 1024);
     const parsed = parseJSON<string[]>(raw);
     if (Array.isArray(parsed) && parsed.length >= 4) return parsed.slice(0, 6);
   } catch (e) { console.warn('Gemini challenges fallback:', e); }
@@ -60,7 +234,7 @@ Return ONLY a JSON array of 6 strings, no other text:
   ];
 }
 
-/** Generate 8-12 ordered roadmap milestones for any goal */
+/** Generate 8 ordered roadmap milestones for any goal */
 export async function generateRoadmapMilestones(
   goal: string,
   educationLevel: string,
@@ -89,7 +263,7 @@ Return exactly 8 milestone objects as a JSON array. Each object:
 category must be one of: "Foundation","Core","Practice","Project","Career"
 First milestone status="unlocked", rest="locked". Return ONLY the JSON array.`;
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGemini(prompt, 2048);
     const parsed = parseJSON<Partial<Milestone>[]>(raw);
     if (Array.isArray(parsed) && parsed.length >= 4) {
       return parsed.map((m, i) => ({
@@ -162,7 +336,7 @@ Return ONLY a JSON array:
 }]
 difficulty: "Beginner"|"Intermediate"|"Advanced". Mix: 3 easy, 5 medium, 2 hard. Return ONLY JSON array.`;
   try {
-    const raw = await callGemini(prompt);
+    const raw = await callGemini(prompt, 2048);
     const parsed = parseJSON<Partial<DiagnosticQuestion>[]>(raw);
     if (Array.isArray(parsed) && parsed.length >= 4) {
       return parsed.slice(0, count).map((q, i) => ({
