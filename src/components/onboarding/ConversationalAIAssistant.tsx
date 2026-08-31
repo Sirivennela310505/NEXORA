@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Bot, 
   Send, 
   Mic, 
   MicOff, 
@@ -469,32 +468,55 @@ export const ConversationalAIAssistant: React.FC<ConversationalAIAssistantProps>
     );
   }
 
+  // Stage-based heading config
+  const stageHeadings = [
+    { step: '01', label: 'Your Goal',        title: 'What Do You Want to Achieve?',         sub: 'Tell us your dream target — career, exam, or skill you want to master.' },
+    { step: '02', label: 'Your Background',  title: 'Where Are You Right Now?',              sub: 'Share your current education or career stage so we can tailor the path.' },
+    { step: '03', label: 'Your Interests',   title: 'What Skills Do You Already Have?',      sub: 'Pick the topics you are comfortable with — we will build on your strengths.' },
+    { step: '04', label: 'Your Weak Areas',  title: 'Where Do You Struggle the Most?',      sub: 'Identify your bottlenecks so we can focus the roadmap on what matters.' },
+    { step: '05', label: 'Your Time',        title: 'How Much Time Can You Dedicate Daily?', sub: 'We will sequence your milestones to fit your schedule realistically.' },
+    { step: '06', label: 'All Set!',         title: 'Building Your Personalised Roadmap…',  sub: 'NEXORA AI is generating your custom learning path in real-time.' },
+  ];
+  const currentHeading = stageHeadings[Math.min(stage, stageHeadings.length - 1)];
+
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 py-8 px-4 sm:px-6 flex flex-col justify-between max-w-4xl mx-auto">
-      
-      {/* Header bar */}
-      <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/[0.08] backdrop-blur-md flex items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-brand-600/20 border border-brand-500/40 flex items-center justify-center text-brand-400">
-            <Bot className="w-5 h-5" />
+
+      {/* ── Clean Page Header ── */}
+      <div className="mb-8">
+        {/* Step badge + skip button row */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold tracking-widest uppercase text-brand-400 bg-brand-500/10 border border-brand-500/25 px-3 py-1 rounded-full">
+              Step {currentHeading.step} of 05
+            </span>
+            <span className="text-[11px] text-slate-500 font-medium">{currentHeading.label}</span>
           </div>
-          <div>
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              <span>NEXORA Requirement Gathering AI</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                Live Interactive Mode
-              </span>
-            </h2>
-            <p className="text-[11px] text-slate-400">Tell us your goal via voice or text — AI builds your visual roadmap in real-time.</p>
-          </div>
+          <button
+            onClick={startLiveGeneration}
+            className="text-xs px-4 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700 hover:border-slate-500 transition-all"
+          >
+            Skip &amp; Auto-Generate
+          </button>
         </div>
 
-        <button
-          onClick={startLiveGeneration}
-          className="text-xs px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors shrink-0"
-        >
-          Skip & Auto-Generate
-        </button>
+        {/* Main heading */}
+        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-snug mb-1">
+          {currentHeading.title}
+        </h1>
+        <p className="text-sm text-slate-400">{currentHeading.sub}</p>
+
+        {/* Progress dots */}
+        <div className="flex items-center gap-2 mt-4">
+          {stageHeadings.slice(0, 5).map((_, i) => (
+            <div
+              key={i}
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                i < stage ? 'bg-brand-500 w-6' : i === stage ? 'bg-brand-400 w-10' : 'bg-slate-700 w-4'
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Messages Stream */}
